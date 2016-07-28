@@ -21,7 +21,7 @@ limit=10 #递减下限
 #文件系统所在的设备名称
 devname=
 #lustre将要挂载的分区的索引号:devname指定的设备上的分区
-devindex=1
+devindex=8
 #mds 的ip
 mdsnode=
 #
@@ -131,7 +131,7 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULT
 
 #配置mds node
 echo "MULTEXU INFO:configure mdsnode[${mdsnode}] ..."
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${mdsnode} --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_mdsnode.sh -d ${devname} -i 0 -m mdt"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${mdsnode} --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_mdsnode.sh -d ${devname}${devindex} -i 0 -m mdt"
 ssh_check_singlenode_status "${mdsnode}" "${MULTEXU_STATUS_EXECUTE}"  $((sleeptime/4)) "${limit}"
 echo "MULTEXU INFO:finished configuring mdsnode[${mdsnode}] ..."
 #清除信号量  避免干扰

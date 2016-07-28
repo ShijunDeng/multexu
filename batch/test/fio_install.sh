@@ -16,9 +16,9 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
-
+`${PAUSE_CMD}`
 #清除信号量  避免干扰
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+clear_execute_statu_signal
 
 #
 #如果fio目录存在,表示fio已经解压安装过;否则进行解压安装;
@@ -38,5 +38,4 @@ then
 fi
 
 #置入执行信号量 代表fio安装完成
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --send_execute_statu_signal=${MULTEXU_STATUS_EXECUTE}"
-
+send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"

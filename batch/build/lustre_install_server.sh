@@ -43,10 +43,8 @@ wait
 rpm -ivh lustre-osd-ldiskfs-2.4.0*
 wait
 
-
 rpm -ivh lustre-2.4.0*
 wait
-
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 echo "MULTEXU INFO:leave directory $( dirname "${BASH_SOURCE[0]}" )..."

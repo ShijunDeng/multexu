@@ -123,7 +123,7 @@ function execute_sshcmd()
 	local iptable_array_var=$@;
 	for ip_var in ${iptable_array_var[@]}
 	do	  
-		ssh -f ${ip_var} ${cmd_str}
+		ssh -f ${ip_var} "${cmd_str}"
 	done
 }
 
@@ -181,6 +181,10 @@ function main()
 				exit 1
 			fi
 			;;
+		--supercmd=?*)  #the most complex command,when this parameter is used , it must be as the last parameter
+			cmd_cmd=${@#*--supercmd=}
+			break
+			;;
 		-c=?*|--cmd=?*)
 			cmd_cmd=${1#*=} # Delete everything up to "=" and assign the remainder.
 			shift
@@ -189,7 +193,6 @@ function main()
 				cmd_cmd="${cmd_cmd} $1"
 				shift
 			done
-			echo ${cmd_cmd}
 			;;
 		-c|--cmd=)		 # Handle the case of an empty --file=
 			printf 'MULTEXU ERROR: "-c|--cmd" requires a non-empty option argument.\n' >&2

@@ -26,8 +26,8 @@ start=`parted ${devname} print free |awk '$0 ~ /Free Space/ {print $1}' | tail -
 if [ ! -n "${start}" ]; then
 	start="0G"
 fi
-parted -s ${devname} mkpart primary ${start} 100%
-#parted -s ${devname} mkpart logical ${start} 100%
+#parted -s ${devname} mkpart primary ${start} 100%
+parted -s ${devname} mkpart logical ${start} 100%
 #获取本机ip 并安装一定格式处理
 ip=`ifconfig | grep "inet addr:" | grep -v "127.0.0.1" | cut -d: -f2|awk '{print $1}'`
 echo "MULTEXU INFO:node[${ip}] executing command: parted -s ${devname} mkpart logical ${start} 100% ..."

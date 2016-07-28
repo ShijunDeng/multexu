@@ -70,7 +70,7 @@ function ssh_check_singlenode_status()
 			local retval=
 			ssh_get_execute_statu_signal "${host_ip}" retval
 			#retval=$?
-                        if [[ "${retval}" -ne "${status}" ]]
+                        if [[ "${retval}" != "${status}" ]]
                         then
                                         loop=1
                         fi
@@ -103,7 +103,7 @@ function ssh_check_cluster_status()
 					local retval=
 					ssh_get_execute_statu_signal "${host_ip}" retval
 					#retval=$?
-					if [[ "${retval}" -ne "${status}" ]]
+					if [[ "${retval}" != "${status}" ]]
                                         then
                                                         loop=1
                                                         break

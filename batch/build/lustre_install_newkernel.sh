@@ -44,7 +44,6 @@ wait
 echo "MULTEXU INFO:install kernel,it may take a long time,please wait patiently..."
 rpm -ivh kernel-2.6.32-358.6.2.el6_lustre?*.rpm -f --oldpackage
 wait
-
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 echo "MULTEXU INFO:leave directory $( dirname "${BASH_SOURCE[0]}" )"

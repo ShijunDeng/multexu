@@ -18,7 +18,7 @@ fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"  
 
-sleeptime=60 #设置检测的睡眠时间
+sleeptime=20 #设置检测的睡眠时间
 limit=10 #递减下限
 
 #测试参数
@@ -30,16 +30,16 @@ iodepth=5
 allow_mounted_write=1
 ioengine="psync"
 special_cmd_randIO='-rwmixread=70' #随机IO时的一些特殊参数
-size="512M"
-numjobs=15
-runtime=500
+size="128M"
+numjobs=4
+runtime=90
 name="ascar_test"
 
 blocksize_start=1
-blocksize_end=2048
+blocksize_end=4
 blocksize_multi_step=2
 #设置检测测试是否结束的时间以及检测的下限
-checktime_init=300
+checktime_init=180
 checktime_lower_limit=60
 #IO方式
 declare -a rw_array;#Type of I/O pattern. 
@@ -47,22 +47,22 @@ declare -a rw_array;#Type of I/O pattern.
 #fio的读写方式
 rw_array[0]="readwrite"
 rw_array[1]="randrw"
-rw_array[2]="write"
-rw_array[3]="randwrite"
-rw_array[4]="read"
-rw_array[5]="randread"
+#rw_array[2]="write"
+#rw_array[3]="randwrite"
+#rw_array[4]="read"
+#rw_array[5]="randread"
 
 client_ip=
 scheduler=
 #调度算法的名称noop anticipatory [deadline] cfq tb new_sysdeadline
 declare -a schedulers_name
 schedulers_name[0]='noop'
-schedulers_name[1]='anticipatory'
-schedulers_name[2]='deadline'
+#schedulers_name[1]='anticipatory'
+#schedulers_name[2]='deadline'
 #标识ascar是否启用
 ascar=
 
-获取参数值
+#获取参数值
 function main()
 {
 	while :; 
@@ -108,7 +108,7 @@ done
 #
 echo "MULTEXU INFO:now start to check fio tool in client nodes..."
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_TEST_DIR}/fio_install.sh"
-ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_EXECUTE}" $((sleeptime/4)) ${limit}
+ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}" $((sleeptime/4)) ${limit}
 echo "MULTEXU INFO:finished fio checking..."
 `${PAUSE_CMD}`
 #清除信号量  避免干扰
@@ -119,7 +119,7 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${M
 #
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rmdir /mnt/lustre/test/"
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -rf /mnt/lustre/test"
-sleep ${sleep}s
+sleep ${sleeptime}s
 #建立测试目录
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="mkdir /mnt/lustre/test/"
 #设置lustre的stripe
@@ -172,11 +172,11 @@ do
 			`${PAUSE_CMD}`	
 			echo "${cmdvar}" > ${dirname}/${filename}
 			#测试结果写入文件
-			sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${TEST_DIR}/luspinf_test_exe.sh \"${cmdvar}\"" >> ${dirname}/${filename}
+			sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --supercmd="sh "${MULTEXU_BATCH_TEST_DIR}"/_test_exe.sh \"${cmdvar}\" " >> ${dirname}/${filename}
 			#检测测试是否完成
 			ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}" ${checktime_init} ${checktime_lower_limit}
 			#清除标记
-			sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal			
+			sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"			
 			echo "MULTEXU INFO:finish one test..."
 			`${PAUSE_CMD}`
 		done #blocksize
