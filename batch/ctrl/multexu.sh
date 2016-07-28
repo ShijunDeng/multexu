@@ -8,7 +8,7 @@
 #initialization
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
 if [ ! -f __init.sh ]; then
-	echo "MULTEXU Error:multexu initialization failure:cannot find the file _init.sh... "
+	echo "MULTEXU ERROR:multexu initialization failure:cannot find the file __init.sh... "
 	exit 1
 else
 	source ./__init.sh
@@ -160,8 +160,8 @@ function main()
 			location=${1#*=} # Delete everything up to "=" and assign the remainder.
 			shift
 			;;
-		-l|--location=)		 # Handle the case of an empty --file=
-			printf 'ERROR: "-s|--sendfile" requires a non-empty option argument.\n' >&2
+		-l=*|--location=*)		 # Handle the case of an empty -l=|--location=
+			printf 'MULTEXU ERROR: "-s|--sendfile" requires a non-empty option argument.\n' >&2
 			exit 1
 			;;
 		-s=?*|--sendfile=?*)	   # Takes an option argument, ensuring it has been specified.
@@ -169,7 +169,7 @@ function main()
 			shift
 			;;
 		-s|--sendfile=)		 # Handle the case of an empty --file=
-			printf 'ERROR: "-s|--sendfile" requires a non-empty option argument.\n' >&2
+			printf 'MULTEXU ERROR: "-s|--sendfile" requires a non-empty option argument.\n' >&2
 			exit 1
 			;;
 		-u|--udefine)	   # Takes an option argument, ensuring it has been specified.
@@ -177,7 +177,7 @@ function main()
 				undefine=$2
 				shift
 			else
-				printf 'ERROR: "-u|--undefine" requires a non-empty option argument.\n' >&2
+				printf 'MULTEXU ERROR: "-u|--undefine" requires a non-empty option argument.\n' >&2
 				exit 1
 			fi
 			;;
@@ -192,7 +192,7 @@ function main()
 			echo ${cmd_cmd}
 			;;
 		-c|--cmd=)		 # Handle the case of an empty --file=
-			printf 'ERROR: "-c|--cmd" requires a non-empty option argument.\n' >&2
+			printf 'MULTEXU ERROR: "-c|--cmd" requires a non-empty option argument.\n' >&2
 			exit 1
 			;;
 		-i=?*|--iptable=?*)
@@ -200,7 +200,7 @@ function main()
 			shift
 			;;
 		-i=|--iptable=)		 # Handle the case of an empty --file=
-			printf 'ERROR: "--iptable" requires a non-empty option argument.\n' >&2
+			printf 'MULTEXU ERROR: "--iptable" requires a non-empty option argument.\n' >&2
 			exit 1
 			;;
 		-v|--version)
@@ -215,7 +215,7 @@ function main()
 			shift
 			;;
 		-?*)
-			printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+			printf 'MULTEXU WARN: Unknown option (ignored): %s\n' "$1" >&2
 			shift
 			;;
 		*)			   # Default case: If no more options then break out of the loop.
@@ -230,15 +230,15 @@ function main()
 		check_ip_array "${ip_array[@]}"
 			retval=$?
 			if [[ "$retval" -ne 0 ]]; then
-				echo 'MULTEXU Error:the parameter iptable string contains illegal ip address...'
+				echo 'MULTEXU ERROR:the parameter iptable string contains illegal ip address...'
 				exit 1
 			fi
 	else #the parameter iptables must be given
-		echo "MULTEXU Error:the parameter iptable is necessary..."
+		echo "MULTEXU ERROR:the parameter iptable is necessary..."
 	fi
 	#command must be given
 	if [ ! -n "${cmd_reboot}" ] && [ ! -n "${cmd_cmd}" ] && [ ! -n "${filenames}" ]; then
-		echo "MULTEXU Error:the commamd is necessary..."
+		echo "MULTEXU ERROR:the commamd is necessary..."
 		exit 1
 	fi	
 
@@ -249,7 +249,7 @@ function main()
 	fi
 	if [ -n "$filenames" ]; then
 		if [ ! -n "${location}" ]; then
-			echo "MULTEXU Error:destination location is necessary..."
+			echo "MULTEXU ERROR:destination location is necessary..."
 			exit 1
 		fi
 		sendfiles "${filenames}" "${location}" "${ip_array[@]}"
