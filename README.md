@@ -1,4 +1,11 @@
-# multexu
+![](https://github.com/ShijunDeng/multexu/blob/master/private/images/logo.png)
+multexu - A muxmulti-node execution tool
+=========================
+[![TeamCity CodeBetter](https://img.shields.io/teamcity/codebetter/bt428.svg?maxAge=2592000)]()
+[![Packagist](https://img.shields.io/packagist/v/symfony/symfony.svg?maxAge=2592000)]()
+[![Yii2](https://img.shields.io/badge/Powered_by-multexu Framework-green.svg?style=flat)]()
+
+
 **multexu** is an open source, fault-tolerant, and highly scalable cluster control and execution system for large and small Linux clusters,ie. muxmulti-node execution tool. With multexu,the work of development and managine in multi-node environment will be much more easily.
 
 ---
