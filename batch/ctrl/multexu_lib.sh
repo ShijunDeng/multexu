@@ -65,7 +65,7 @@ function ssh_check_singlenode_status()
         while [[ loop -ne 0 ]]
         do
                         loop=0;
-                        echo "MULTEXU INFO:the state of node ${host_ip}:[${status}],the next check time will be ${sleeptime}s later...";
+                        print_message "MULTEXU_INFO" "the state of node ${host_ip}:[${status}],the next check time will be ${sleeptime}s later..."
                         sleep ${sleeptime}s
 			local retval=
 			ssh_get_execute_statu_signal "${host_ip}" retval
@@ -96,7 +96,7 @@ function ssh_check_cluster_status()
         while [[ loop -ne 0 ]]
         do
                         loop=0;
-                        echo "MULTEXU INFO:the state of nodes which its ip in ${iptable}:[ ${status}],the next check time will be ${sleeptime}s later...";
+                        print_message "MULTEXU_INFO" "the state of nodes which its ip in ${iptable}:[ ${status}],the next check time will be ${sleeptime}s later..."
                         sleep ${sleeptime}s
                         for host_ip in $(cat  "${MULTEXU_BATCH_CONFIG_DIR}/${iptable}")
                         do
@@ -116,4 +116,18 @@ function ssh_check_cluster_status()
         done
 }
 
+#
+#输出程序的提示信息
+#参数：消息类型  消息内容
+#
+function print_message()
+{
+	local message_type=$1
+	shift
+	case ${message_type} in
+		MULTEXU_INFO|MULTEXU_ERROR|MULTEXU_WARN)
+			echo "${message_type}:$@"
+			;;
+	esac
+}
 

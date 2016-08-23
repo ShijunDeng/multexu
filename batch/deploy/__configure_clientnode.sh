@@ -34,7 +34,7 @@ if [ ! -d "/mnt/${mnt_position}" ]; then
 fi
 
 ip=`ifconfig|grep "inet addr:"|grep -v "127.0.0.1"|cut -d: -f2|awk '{print $1}'`
-echo "MULTEXU INFO:client [${ip}] mount -t lustre ${mdsnode}@tcp:/lustrefs /mnt/${mnt_position}"
+print_message "MULTEXU_INFO" "client [${ip}] mount -t lustre ${mdsnode}@tcp:/lustrefs /mnt/${mnt_position}"
 mount -t lustre ${mdsnode}@tcp:/lustrefs /mnt/${mnt_position}
 wait
 clear_execute_statu_signal

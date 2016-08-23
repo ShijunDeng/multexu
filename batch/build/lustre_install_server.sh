@@ -17,9 +17,9 @@ fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
                                                                      
-echo "MULTEXU INFO:install dependencies..."                                       
+print_message "MULTEXU_INFO" "install dependencies..."                                       
 cd "${MULTEXU_SOURCE_DIR}"
-echo "MULTEXU INFO:enter directory ${MULTEXU_SOURCE_DIR}..."
+print_message "MULTEXU_INFO" "enter directory ${MULTEXU_SOURCE_DIR}..."
 
 rpm -ivh lustre-modules*
 wait
@@ -47,6 +47,6 @@ rpm -ivh lustre-2.4.0*
 wait
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
-echo "MULTEXU INFO:leave directory $( dirname "${BASH_SOURCE[0]}" )..."
+print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )..."
 
 `${PAUSE_CMD}`

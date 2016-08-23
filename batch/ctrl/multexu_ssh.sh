@@ -29,9 +29,9 @@ function __test_host_available()
 	ping -c1 -w1 $host_ip &>/dev/null
 	if [ $? -ne 0 ] 
 	then
-		eval echo "MULTEXU ERROR:destination host[${host_ip}] unreachable..."
+		print_message "MULTEXU_ERROR" "destination host[${host_ip}] unreachable..."
 	else
-		eval echo "MULTEXU INFO:destination host[${host_ip}] reachable..."
+		print_message "MULTEXU_INFO" "destination host[${host_ip}] reachable..."
 	fi
 }
 
@@ -73,10 +73,10 @@ function __test_host_ssh_enabled()
 	local host_ip=$1
 	(nc ${host_ip}  22  < /dev/null) &> /dev/null
 	if [ $? -eq 0 ]; then
-    		eval echo "MULTEXU INFO:ssh is enabled on the remote computer[$host_ip]..."
+    		print_message "MULTEXU_INFO" "ssh is enabled on the remote computer[${host_ip}]..."
 	else
-    		eval echo "MULTEXU ERROR:ssh is not enabled on the remote computer[$host_ip]..."
-fi
+    		print_message "MULTEXU_ERROR" "ssh is not enabled on the remote computer[${host_ip}]..."
+	fi
 }
 
 #

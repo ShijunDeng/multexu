@@ -106,10 +106,10 @@ done
 #
 #安装fio
 #
-echo "MULTEXU INFO:now start to check fio tool in client nodes..."
+print_message "MULTEXU_INFO" "now start to check fio tool in client nodes..."
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_TEST_DIR}/fio_install.sh"
 ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}" $((sleeptime/4)) ${limit}
-echo "MULTEXU INFO:finished fio checking..."
+print_message "MULTEXU_INFO" "finished fio checking..."
 `${PAUSE_CMD}`
 #清除信号量  避免干扰
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
@@ -124,15 +124,15 @@ sleep ${sleeptime}s
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="mkdir /mnt/lustre/test/"
 #设置lustre的stripe
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="lfs setstripe -c -1 /mnt/lustre/test"
-echo "MULTEXU INFO:all ost have been used..."
+print_message "MULTEXU_INFO" "all ost have been used..."
 `${PAUSE_CMD}`
 rm -rf testResult
 #定时清除服务器上的日志,因为测试的过程中会产生大量的日志,很可能会占用大量的日志空间或者影响服务器的性能
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_TEST_DIR}/clear_var_log_messages.sh"
-echo "MULTEXU INFO:the script clear_var_log_messages.sh is running in ipall.out set..."
+print_message "MULTEXU_INFO" "the script clear_var_log_messages.sh is running in ipall.out set..."
 
 cd ${MULTEXU_BATCH_TEST_DIR}/
-echo "MULTEXU INFO:enter directory ${MULTEXU_BATCH_TEST_DIR}..."
+print_message "MULTEXU_INFO" "enter directory ${MULTEXU_BATCH_TEST_DIR}..."
 `${PAUSE_CMD}`
 
 #
@@ -140,7 +140,7 @@ echo "MULTEXU INFO:enter directory ${MULTEXU_BATCH_TEST_DIR}..."
 #
 for scheduler in ${schedulers_name[*]}
 do
-	echo "MULTEXU INFO:now start the test processes..."
+	print_message "MULTEXU_INFO" "now start the test processes..."
 	for rw_pattern in ${rw_array[*]}
 	do
 		dirname="testResult/${rw_pattern}";
@@ -148,13 +148,13 @@ do
 			mkdir -p ${dirname};
 		fi
 		
-		echo "MULTEXU INFO:check io sheduler..."
+		print_message "MULTEXU_INFO" "check io sheduler..."
 		#修改调度器 并显示修改后的调度器名称
 		sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="echo ${scheduler} > /sys/block/sda/queue/scheduler && cat /sys/block/sda/queue/scheduler"
 
 		for ((blocksize=${blocksize_start} ;blocksize <= ${blocksize_end}; blocksize*=${blocksize_multi_step}))
 		do
-			echo "MULTEXU INFO:start a test..."
+			print_message "MULTEXU_INFO" "start a test..."
 			
 			special_cmd_randio_choice=
 			if [[ ${rw_pattern} =~ "rand" ]] ;then
@@ -162,7 +162,7 @@ do
 			fi
 
 			cmdvar="${MULTEXU_SOURCE_DIR}/fio/fio -directory=${directory} -direct=${direct} -iodepth ${iodepth} -thread -rw=${rw_pattern} ${special_cmd_randio_choice} -allow_mounted_write=${allow_mounted_write} -ioengine=${ioengine} -bs=${blocksize}k -size=${size} -numjobs=${numjobs} -runtime=${runtime} -group_reporting -name=${name} "
-			echo "MULTEXU INFO:test command[${cmdvar}]"
+			print_message "MULTEXU_INFO" "test command[${cmdvar}]"
 			#删除测试文件
 			sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f /mnt/lustre/test/*"
 			sleep ${sleeptime}s
@@ -177,7 +177,7 @@ do
 			ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}" ${checktime_init} ${checktime_lower_limit}
 			#清除标记
 			sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"			
-			echo "MULTEXU INFO:finish one test..."
+			print_message "MULTEXU_INFO" "finish one test..."
 			`${PAUSE_CMD}`
 		done #blocksize
 	done #rw_pattern
@@ -189,5 +189,5 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${M
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f /mnt/lustre/test/*"
 `${PAUSE_CMD}`
 
-echo "MULTEXU INFO:all test jobs has been finished..."
+print_message "MULTEXU_INFO" "all test jobs has been finished..."
 exit 0

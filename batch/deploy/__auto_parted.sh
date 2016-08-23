@@ -30,7 +30,7 @@ fi
 parted -s ${devname} mkpart logical ${start} 100%
 #获取本机ip 并安装一定格式处理
 ip=`ifconfig | grep "inet addr:" | grep -v "127.0.0.1" | cut -d: -f2|awk '{print $1}'`
-echo "MULTEXU INFO:node[${ip}] executing command: parted -s ${devname} mkpart logical ${start} 100% ..."
+print_message "MULTEXU_INFO" "node[${ip}] executing command: parted -s ${devname} mkpart logical ${start} 100% ..."
 
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"

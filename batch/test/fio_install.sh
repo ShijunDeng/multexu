@@ -25,7 +25,7 @@ clear_execute_statu_signal
 #
 if [ ! -d ${MULTEXU_SOURCE_DIR}/fio ] ;
 then
-	echo "MULTEXU INFO:now start to install fio..."
+	print_message "MULTEXU_INFO" "now start to install fio..."
 	cd ${MULTEXU_SOURCE_DIR}/
 	yum -y install gtk2-devel 
 	yum -y install glib2-devel

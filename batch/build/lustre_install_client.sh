@@ -17,7 +17,7 @@ fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
                                                                      
-echo "MULTEXU INFO:install dependencies..."                                       
+print_message "MULTEXU_INFO" "install dependencies..."                                       
 cd "${MULTEXU_SOURCE_DIR}"
 echo "MULTEXU INFO:enter directory ${MULTEXU_SOURCE_DIR}..."
 
@@ -45,7 +45,7 @@ modprobe lustre
 wait
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
-echo "MULTEXU INFO:leave directory $( dirname "${BASH_SOURCE[0]}" )..."
+print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )..."
 `${PAUSE_CMD}`
 exit 0
 ###############################################################################################################
@@ -78,7 +78,7 @@ make rpms
 wait
 
 cd /root/rpmbuild/RPMS/x86_64/
-echo "MULTEXU INFO:enter directory /root/rpmbuild/RPMS/x86_64/..."
+print_message "MULTEXU_INFO" "enter directory /root/rpmbuild/RPMS/x86_64/..."
 `${PAUSE_CMD}`
 rpm -ivh lustre-client-modules?*.rpm --nodeps --force
 wait
@@ -91,5 +91,5 @@ modprobe lustre
 wait
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
-echo "MULTEXU INFO:leave directory $( dirname "${BASH_SOURCE[0]}" )..."
+print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )..."
 `${PAUSE_CMD}`

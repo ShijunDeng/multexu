@@ -23,7 +23,7 @@ fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
 
-echo "Now start to install lustre 2.4.0 ..."
+print_message "MULTEXU_INFO" "Now start to install lustre 2.4.0 ..."
 #检测和节点的状态：是否可达  ssh端口22是否启用
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_available=nodes_all.out
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_ssh_enabled=nodes_all.out
@@ -40,12 +40,12 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULT
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --send_execute_statu_signal=${MULTEXU_STATUS_REBOOT}"
 #命令结点重启
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --reboot
-echo "MULTEXU INFO:the nodes which its ip in node_all.out are going to reboot..."
+print_message "MULTEXU_INFO" "the nodes which its ip in node_all.out are going to reboot..."
 #睡眠 暂停一段时间
 `${PAUSE_CMD}`
 #循环检测是否重启完成
 ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_REBOOT}" ${sleeptime} ${limit}
-echo "MULTEXU INFO:the nodes which its ip in nodes_all.out finished to reboot..."
+print_message "MULTEXU_INFO" "the nodes which its ip in nodes_all.out finished to reboot..."
 #检测和节点的状态：是否可达  ssh端口22是否启用
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_available=nodes_all.out
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_ssh_enabled=nodes_all.out
@@ -62,14 +62,14 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULT
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --send_execute_statu_signal=${MULTEXU_STATUS_REBOOT}"
 #命令结点重启
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --reboot
-echo "MULTEXU INFO: the nodes which its ip in node_all.out are going to reboot..."
+print_message "MULTEXU_INFO" " the nodes which its ip in node_all.out are going to reboot..."
 #睡眠 暂停一段时间
 `${PAUSE_CMD}`
 `${PAUSE_CMD}`
 #循环检测是否重启完成
 ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_REBOOT}" ${sleeptime} ${limit}
-echo "MULTEXU INFO:the nodes which its ip in nodes_all.out finished to reboot..."
-echo "MULTEXU INFO:now start to install lustre server and client... "
+print_message "MULTEXU_INFO" "the nodes which its ip in nodes_all.out finished to reboot..."
+print_message "MULTEXU_INFO" "now start to install lustre server and client... "
 #检测和节点的状态：是否可达  ssh端口22是否启用
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_available=nodes_all.out
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_ssh_enabled=nodes_all.out
@@ -81,4 +81,4 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${M
 
 ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
 
-echo "MULTEXU INFO:finish installing process..."
+print_message "MULTEXU_INFO" "finish installing process..."

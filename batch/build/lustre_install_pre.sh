@@ -18,12 +18,12 @@ fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
 
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
-echo "MULTEXU INFO:set SELINUX=disabled"
+print_message "MULTEXU_INFO" "set SELINUX=disabled"
 
 chkconfig iptables off;
-echo "MULTEXU INFO:disable iptables firewall... "
+print_message "MULTEXU_INFO" "disable iptables firewall... "
 service iptables stop
-echo "MULTEXU INFO:service iptables stoped ..."
+print_message "MULTEXU_INFO" "service iptables stoped ..."
 
 #yum clean metadata 
 #yum clean dbcache  
@@ -33,4 +33,4 @@ echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config
 
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
-echo "MULTEXU INFO:leave directory $( dirname "${BASH_SOURCE[0]}" )"
+print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )"

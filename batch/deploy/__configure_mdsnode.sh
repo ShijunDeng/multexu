@@ -40,7 +40,7 @@ while getopts 'd:i:m:' opt;do
 done
 
 if [ ! -n ${devname} ] || [ ! -n ${index} ] || [ ! -n ${mnt_position} ]; then
-	echo "MULTEXU ERROR:-d|-i|-m is necessary..."
+	print_message "MULTEXU_ERROR" "-d|-i|-m is necessary..."
 	exit 1
 fi
 

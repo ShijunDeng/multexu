@@ -17,58 +17,58 @@ else
 	`${PAUSE_CMD}`
 fi
 
-echo '### Now begin the installation procedure###'
+print_message "MULTEXU_INFO" "### Now begin the installation procedure###"
 
-echo "Entering directory '${MULTEXU_SOURCE_DIR}'"
+print_message "MULTEXU_INFO" "Entering directory '${MULTEXU_SOURCE_DIR}'"
 cd ${MULTEXU_SOURCE_DIR}
 
-echo 'installing dependencies...'
+print_message "MULTEXU_INFO" "installing dependencies..."
 `${PAUSE_CMD}`
 yum install wget gcc gcc-c++ make kernel-devel kernel-headers perl rpm-build -y
 yum install hwloc hwloc-devel numactl readline-devel mysql-devel pam-devel perl-ExtUtils-MakeMaker rrdtool freeipmi lua-devel gtk2-devel redhat-lsb redhat-rpm-config flex-devel bzip2-devel -y
 yum install bison flex expect -y
 
-echo 'installing blcr...'
+print_message "MULTEXU_INFO" "installing blcr..."
 `${PAUSE_CMD}`
 rpmbuild -tb --define 'with_multilib 0' blcr*
-echo "Entering directory '/root/rpmbuild/RPMS/x86_64/'"
+print_message "MULTEXU_INFO" "Entering directory '/root/rpmbuild/RPMS/x86_64/'"
 `${PAUSE_CMD}`
 cd /root/rpmbuild/RPMS/x86_64/
 yum install blcr* --nogpgcheck -y
 
-echo "Entering directory '${MULTEXU_SOURCE_DIR}'"
+print_message "MULTEXU_INFO" "Entering directory '${MULTEXU_SOURCE_DIR}'"
 cd ${MULTEXU_SOURCE_DIR}
-echo 'installing munge...'
+print_message "MULTEXU_INFO" "installing munge..."
 `${PAUSE_CMD}`
 rpmbuild -tb --clean munge*
-echo "Entering directory '/root/rpmbuild/RPMS/x86_64/'"
+print_message "MULTEXU_INFO" "Entering directory '/root/rpmbuild/RPMS/x86_64/'"
 cd /root/rpmbuild/RPMS/x86_64/
 `${PAUSE_CMD}`
 yum install munge* -y
 
-echo 'produce munge.key,it may take a long time,please wait patiently....'
+print_message "MULTEXU_INFO" "produce munge.key,it may take a long time,please wait patiently...."
 dd if=/dev/random bs=1 count=1024 > /etc/munge/munge.key
 
-echo "Entering directory '${MULTEXU_SOURCE_DIR}'"
+print_message "MULTEXU_INFO" "Entering directory '${MULTEXU_SOURCE_DIR}'"
 cd ${MULTEXU_SOURCE_DIR}
 
-echo 'installing slurm...'
+print_message "MULTEXU_INFO" "installing slurm..."
 `${PAUSE_CMD}`
 rpmbuild -tb --with mysql --with blcr slurm*
-echo "'Entering directory '/root/rpmbuild/RPMS/x86_64/'"
+print_message "MULTEXU_INFO" "'Entering directory '/root/rpmbuild/RPMS/x86_64/'"
 cd /root/rpmbuild/RPMS/x86_64/
 `${PAUSE_CMD}`
 yum install slurm* -y
 
-echo "Entering directory '${MULTEXU_SOURCE_DIR}'"
+print_message "MULTEXU_INFO" "Entering directory '${MULTEXU_SOURCE_DIR}'"
 cd ${MULTEXU_SOURCE_DIR}
 
-echo 'installing IO-Watchdog...'
+print_message "MULTEXU_INFO" "installing IO-Watchdog..."
 `${PAUSE_CMD}`
 rpmbuild -tb io-watchdog*
-echo "Entering directory '/root/rpmbuild/RPMS/x86_64/'"
+print_message "MULTEXU_INFO" "Entering directory '/root/rpmbuild/RPMS/x86_64/'"
 cd /root/rpmbuild/RPMS/x86_64/
 `${PAUSE_CMD}`
 yum install io* -y
 
-echo '### finished installation procedure###'
+print_message "MULTEXU_INFO" "### finished installation procedure###"
