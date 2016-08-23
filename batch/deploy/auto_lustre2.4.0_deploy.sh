@@ -41,8 +41,8 @@ function main()
 				shift
 				;;
 			-?*)
-				print_message "MULTEXU_WARN" "Unknown option (ignored): %s\n' "$1" >&2
-				shift
+                printf 'WARN: Unknown option (ignored): %s\n' "(" >&2")"
+                shift
 				;;
 			*)	# Default case: If no more options then break out of the loop.
 				shift
