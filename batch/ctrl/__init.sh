@@ -14,10 +14,12 @@ function __init()
 	export MULTEXU_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../../ && pwd )"
 	export MULTEXU_SOURCE_DIR="${MULTEXU_BASE_DIR}/source"
 	export MULTEXU_BATCH_DIR="${MULTEXU_BASE_DIR}/batch"
+	export MULTEXU_CODE_DIR="${MULTEXU_BASE_DIR}/code"
 
 	export MULTEXU_BATCH_AUTHORIZE_DIR="${MULTEXU_BATCH_DIR}/authorize"
 	export MULTEXU_BATCH_CONFIG_DIR="${MULTEXU_BATCH_DIR}/config"
 	export MULTEXU_BATCH_BUILD_DIR="${MULTEXU_BATCH_DIR}/build"
+	export MULTEXU_BATCH_INSTALL_DIR="${MULTEXU_BATCH_DIR}/install"
 	export MULTEXU_BATCH_CRTL_DIR="${MULTEXU_BATCH_DIR}/ctrl"
 	export MULTEXU_BATCH_TEST_DIR="${MULTEXU_BATCH_DIR}/test"
 	

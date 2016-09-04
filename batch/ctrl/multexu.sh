@@ -241,7 +241,7 @@ function main()
 	fi
 	#command must be given
 	if [ ! -n "${cmd_reboot}" ] && [ ! -n "${cmd_cmd}" ] && [ ! -n "${filenames}" ]; then
-		echo "MULTEXU ERROR:the commamd is necessary..."
+		echo "MULTEXU ERROR:the command is necessary..."
 		exit 1
 	fi	
 
