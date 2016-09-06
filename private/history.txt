@@ -1,0 +1,16 @@
+#最好在同构节点中的同一个目录下运行
+sh build/auto_lustre2.4.0_install.sh
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='rm -rf /usr/src/ascar'
+sh ctrl/multexu.sh --iptable=nodes_all.out --sendfile=/usr/src/ascar --location=/usr/src
+sh deploy/auto_lustre2.4.0_deploy.sh --mdsnode=192.168.122.140 --devname=/dev/sda
+
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='rpm -aq | grep kernel'
+
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='rpm -e kernel-2.6.32-358.6.2.el6_lustre.g230b174.x86_64 -f --nodeps'
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='yum -y remove kernel-2.6.32-358.6.2.el6_lustre.g230b174.x86_64'
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='yum -y remove kernel-firmware-2.6.32-358.6.2.el6_lustre.g230b174.x86_64'
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd=reboot
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd="kill -9 $(pidof fio)"
+
+history 
+history > history.txt
