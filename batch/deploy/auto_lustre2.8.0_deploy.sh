@@ -114,7 +114,7 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_ssh_enabled=nodes_all.o
 
 
 #在server node 分区
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_server.out --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__auto_parted.sh ${devname} ${devindex}"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_server.out --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__auto_parted.sh -d ${devname} -i ${devindex}"
 ssh_check_cluster_status "nodes_server.out" "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
 print_message "MULTEXU_INFO" "the nodes which its ip in nodes_server.out finished to part ${devname}${devindex}..."
 #清除信号量  避免干扰
@@ -133,7 +133,7 @@ ssh_check_cluster_status "nodes_server.out" "${MULTEXU_STATUS_REBOOT}" "${sleept
 print_message "MULTEXU_INFO" "the nodes which its ip in nodes_all.out finished to reboot..."
 
 #格式化server上的devname设备为ext4
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_server.out --cmd="mkfs.ext4 ${devname}"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_server.out --cmd="y | mkfs.ext4 ${devname}"
 
 #清除信号量  避免干扰
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"

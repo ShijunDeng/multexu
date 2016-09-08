@@ -9,10 +9,10 @@
 #initialization
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 if [ ! -f ../ctrl/__init.sh ]; then
-	echo " multexu initialization failure:cannot find the file __init.sh... "
-	exit 1
+    echo " multexu initialization failure:cannot find the file __init.sh... "
+    exit 1
 else
-	source ../ctrl/__init.sh
+    source ../ctrl/__init.sh
 fi
 
 #声明环境变量
@@ -39,7 +39,7 @@ sh ${MULTEXU_BATCH_AUTHORIZE_DIR}/distribute.sh && sh ${MULTEXU_BATCH_AUTHORIZE_
 echo "MULTEXU INFO:the nodes in nodes_authorize.out are going to reboot ..." 
 for ip_var in $(cat "${MULTEXU_BATCH_CONFIG_DIR}"/nodes_authorize.out)
 do
-	ssh -f ${ip_var} reboot
+    ssh -f ${ip_var} reboot
 done
 
 exit 0

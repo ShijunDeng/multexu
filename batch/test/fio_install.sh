@@ -9,10 +9,10 @@
 #initialization
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
 if [ ! -f ../ctrl/__init.sh ]; then
-        echo "MULTEXU Error:multexu initialization failure:cannot find the file __init.sh... "
-        exit 1
+    echo "MULTEXU Error:multexu initialization failure:cannot find the file __init.sh... "
+    exit 1
 else
-        source ../ctrl/__init.sh
+    source ../ctrl/__init.sh
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
@@ -25,17 +25,17 @@ clear_execute_statu_signal
 #
 if [ ! -d ${MULTEXU_SOURCE_DIR}/tool/fio ] ;
 then
-	print_message "MULTEXU_INFO" "now start to install fio..."
-	cd ${MULTEXU_SOURCE_DIR}/tool/
+    print_message "MULTEXU_INFO" "now start to install fio..."
+    cd ${MULTEXU_SOURCE_DIR}/tool/
 
-	yum -y install gtk2-devel 
-	yum -y install glib2-devel
-	tar -jxv -f fio.tar.bz2 -C ./
-	#git clone git://git.kernel.dk/fio.git
-	cd fio
-	./configure --enable-gfio
-	make fio
-	make gfio
+    yum -y install gtk2-devel 
+    yum -y install glib2-devel
+    tar -jxv -f fio.tar.bz2 -C ./
+    #git clone git://git.kernel.dk/fio.git
+    cd fio
+    ./configure --enable-gfio
+    make fio
+    make gfio
 fi
 
 #置入执行信号量 代表fio安装完成

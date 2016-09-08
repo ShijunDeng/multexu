@@ -18,27 +18,38 @@ fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
 
-devname=$1 #设备名称
-devindex=$2 #分区索引号
+devname= #设备名称
+devindex= #分区索引号
 #分区起始位置
 start= 
 
+while getopts 'd:i:' opt;do
+	case $opt in
+		d)
+			devname=$OPTARG;;
+		i)
+			devindex=$OPTARG;;
+	esac
+done
+if [ ! -n ${devname} ] || [ ! -n ${devindex} ]; then
+    print_message "MULTEXU_ERROR" "-d|-i is necessary..."
+    exit 1
+fi
 start=`parted ${devname} print free |awk '$0 ~ /Free Space/ {print $1}' | tail -1` #分区索引号
 
 if [ ! -n "${start}" ]; then
     start="0G"
 fi
-
-if [[ ${devindex} -lt 5 ]];
-then
-	parted -s ${devname} mkpart primary ${start} 100%	
-else
-	parted -s ${devname} mkpart logical ${start} 100%
-fi
-
 #获取本机ip 并安装一定格式处理
 ip=`ifconfig | grep "inet addr:" | grep -v "127.0.0.1" | cut -d: -f2|awk '{print $1}'`
-print_message "MULTEXU_INFO" "node[${ip}] executing command: parted -s ${devname} mkpart logical ${start} 100% ..."
+
+#格式化为主分区还是逻辑分区,默认是逻辑分区
+type_of_partition="logical"
+if [[ devindex -le 4 ]];then
+    type_of_partition="primary"    
+fi
+parted -s ${devname} mkpart ${type_of_partition} ${start} 100%
+print_message "MULTEXU_INFO" "node[${ip}]: parted -s ${devname} mkpart ${type_of_partition} ${start} 100% ..."
 
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"

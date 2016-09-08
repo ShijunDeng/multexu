@@ -13,11 +13,11 @@ export LANG="en_US.UTF-8"
 
 #检查所需目录及文件,如果没有就创建一个
 if [ ! -d /root/.ssh ];then
-	mkdir /root/.ssh
+    mkdir /root/.ssh
 fi
 
 if [ ! -f /root/.ssh/authorized_keys ];then
-	touch /root/.ssh/authorizedzz_keys
+    touch /root/.ssh/authorizedzz_keys
 fi
 
 setenforce 0

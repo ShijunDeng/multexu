@@ -13,12 +13,12 @@ limit=10 #递减下限
 
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
 if [ ! -f ../ctrl/__init.sh ]; then
-	echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
-	exit 1
+    echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
+    exit 1
 else
-	source ../ctrl/__init.sh
-	echo 'MULTEXU INFO:initialization completed...'
-	`${PAUSE_CMD}`
+    source ../ctrl/__init.sh
+    echo 'MULTEXU INFO:initialization completed...'
+    `${PAUSE_CMD}`
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
@@ -36,7 +36,7 @@ cd kernel
 print_message "MULTEXU_INFO" "install dependencies..."  
 
 #
-# 			yum -y install quilt
+#             yum -y install quilt
 #
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/newt-devel-0.52.15-4.el7.x86_64.rpm
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/slang-devel-2.2.4-11.el7.x86_64.rpm

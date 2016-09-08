@@ -35,12 +35,12 @@ limit=10 #递减下限
 
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
 if [ ! -f ../ctrl/__init.sh ]; then
-	echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
-	exit 1
+    echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
+    exit 1
 else
-	source ../ctrl/__init.sh
-	echo 'MULTEXU INFO:initialization completed...'
-	`${PAUSE_CMD}`
+    source ../ctrl/__init.sh
+    echo 'MULTEXU INFO:initialization completed...'
+    `${PAUSE_CMD}`
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
@@ -58,7 +58,7 @@ cd kernel
 print_message "MULTEXU_INFO" "install dependencies..."  
 
 #
-# 			yum -y install quilt
+#             yum -y install quilt
 #
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/newt-devel-0.52.15-4.el7.x86_64.rpm
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/slang-devel-2.2.4-11.el7.x86_64.rpm
@@ -161,14 +161,14 @@ cd "${BUILD_BASE_DIR}"/BUILD/kernel-3.10.0-327.3.1.el7/linux-3.10.0-327.3.1.el7.
 print_message "MULTEXU_INFO" "now start to make rpm(new kernel)..."
 read -p "choose default .config to continue to execute the command[make -j8 rpm] ?(y/n):" -t 10 choose
 if [[ "${choose}" =~ ^n.*$ || "${choose}" =~ ^N.*$  ]];then
-	exit 0;
+    exit 0;
 fi
 #make oldconfig
 make -j4 rpm
 
 print_message "MULTEXU_INFO" "finished to make rpm(new kernel)..."
 print_message "MULTEXU_INFO" "please execute the following command manually..."
-print_message "MULTEXU_INFO" "1. rpm -ivh --force kernel-3.10.0_3.10.0_327.3.1.el7_lustre.x86_64-1.x86_64.rpm"
+print_message "MULTEXU_INFO" "1. rpm -ivh --force kernel-3.10.0_3.10.0_327.3.1.el7_lustre.x86_64*.rpm"
 #ls  /boot/  ==> System.map-3.10.0-3.10.0-327.3.1.el7_lustre.x86_64  ==> 3.10.0-3.10.0-327.3.1.el7_lustre.x86_64
 print_message "MULTEXU_INFO" "2. /sbin/new-kernel-pkg --package kernel --mkinitrd --dracut --depmod --install 3.10.0-3.10.0-327.3.1.el7_lustre.x86_64"
 print_message "MULTEXU_INFO" "3. reboot"

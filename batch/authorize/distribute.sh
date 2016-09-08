@@ -16,6 +16,6 @@ to_var="${MULTEXU_BATCH_AUTHORIZE_DIR}/"
 #通过for循环将脚本分发到各个被管理机
 for host_ip in $(cat ${MULTEXU_BATCH_CONFIG_DIR}/nodes_authorize.out)
 do
-	ssh -f ${host_ip} "mkdir -p ${to_var}"
-	scp -o StrictHostKeyChecking=no -rp "${from_var}" "${host_ip}":"${to_var}"
+    ssh -f ${host_ip} "mkdir -p ${to_var}"
+    scp -o StrictHostKeyChecking=no -rp "${from_var}" "${host_ip}":"${to_var}"
 done

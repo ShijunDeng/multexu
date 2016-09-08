@@ -36,7 +36,6 @@ while getopts 'd:i:m:' opt;do
 		m)
 			mnt_position=$OPTARG;;
 	esac
-
 done
 
 if [ ! -n ${devname} ] || [ ! -n ${index} ] || [ ! -n ${mnt_position} ]; then
@@ -55,7 +54,9 @@ if [ ! -d "/mnt/${mnt_position}" ]; then
     mkdir /mnt/${mnt_position}
 fi
 
-mount -t lustre ${devname} /mnt/$mnt_position;
+mount -t lustre ${devname} /mnt/$mnt_position
+wait
+modprobe lustre
 wait
 
 #设置完成标识

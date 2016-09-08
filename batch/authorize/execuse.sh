@@ -8,5 +8,5 @@ export LANG="en_US.UTF-8"
 command_var="sh ${MULTEXU_BATCH_AUTHORIZE_DIR}/nodes_authorize.sh"
 for host_ip in $(cat ${MULTEXU_BATCH_CONFIG_DIR}/nodes_authorize.out)
 do
-	ssh -f ${host_ip} "${command_var}"
+    ssh -f ${host_ip} "${command_var}"
 done
