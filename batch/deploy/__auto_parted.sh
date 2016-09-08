@@ -19,15 +19,23 @@ fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
 
 devname=$1 #设备名称
-start= #分区索引号
+devindex=$2 #分区索引号
+#分区起始位置
+start= 
 
 start=`parted ${devname} print free |awk '$0 ~ /Free Space/ {print $1}' | tail -1` #分区索引号
 
 if [ ! -n "${start}" ]; then
-	start="0G"
+    start="0G"
 fi
-#parted -s ${devname} mkpart primary ${start} 100%
-parted -s ${devname} mkpart logical ${start} 100%
+
+if [[ ${devindex} -lt 5 ]];
+then
+	parted -s ${devname} mkpart primary ${start} 100%	
+else
+	parted -s ${devname} mkpart logical ${start} 100%
+fi
+
 #获取本机ip 并安装一定格式处理
 ip=`ifconfig | grep "inet addr:" | grep -v "127.0.0.1" | cut -d: -f2|awk '{print $1}'`
 print_message "MULTEXU_INFO" "node[${ip}] executing command: parted -s ${devname} mkpart logical ${start} 100% ..."

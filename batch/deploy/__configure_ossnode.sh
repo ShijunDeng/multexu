@@ -28,16 +28,16 @@ mnt_position=
 mdsnode=
 
 while getopts 's:d:i:m' opt;do
-	case $opt in
-	    	s)
-			mdsnode=$OPTARG;;
-		d)
-			devname=$OPTARG;;
-		i)
-        		index=$OPTARG;;
-	    	m)
-           		mnt_position=$OPTARG;;
-	esac
+    case $opt in
+        s)
+            mdsnode=$OPTARG;;
+        d)
+            devname=$OPTARG;;
+        i)
+            index=$OPTARG;;
+        m)
+            mnt_position=$OPTARG;;
+    esac
 done
 
 if [ ! -n ${mdsnode} ] || [ ! -n ${devname} ] || [ ! -n ${index} ] || [ ! -n ${mnt_position} ]; then
@@ -53,7 +53,7 @@ mkfs.lustre --fsname=lustrefs --mgsnode=$mdsnode@tcp --ost --index=$index $devna
 wait
 
 if [ ! -d "/mnt/${mnt_position}${index}" ]; then
-	mkdir /mnt/${mnt_position}${index}
+    mkdir /mnt/${mnt_position}${index}
 fi
 
 mount -t lustre ${devname} /mnt/${mnt_position}${index}

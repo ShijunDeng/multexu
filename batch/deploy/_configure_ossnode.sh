@@ -50,8 +50,8 @@ fi
 
 for host_ip in $(cat ${MULTEXU_BATCH_CONFIG_DIR}/nodes_oss.out)
 do
-        command_var="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_ossnode.sh -i ${index} -s ${mdsnode} -d ${devname} -m ${mnt_position}"
-	print_message "MULTEXU_INFO" "executing  ${host_ip} "${command_var}""
-        ssh -f ${host_ip} "${command_var}"
-        let index++
+    command_var="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_ossnode.sh -i ${index} -s ${mdsnode} -d ${devname} -m ${mnt_position}"
+    print_message "MULTEXU_INFO" "executing  ${host_ip} "${command_var}""
+    ssh -f ${host_ip} "${command_var}"
+    let index++
 done

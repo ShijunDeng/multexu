@@ -21,16 +21,16 @@ mdsnode=
 
 while getopts 's:m:' opt;
 do
-	case $opt in
-	    s)
-	            mdsnode=$OPTARG;;
-	    m)
-        	    mnt_position=$OPTARG;;
-	esac
+    case $opt in
+        s)
+                mdsnode=$OPTARG;;
+        m)
+                mnt_position=$OPTARG;;
+    esac
 done
 
 if [ ! -d "/mnt/${mnt_position}" ]; then
-	mkdir /mnt/${mnt_position}
+    mkdir /mnt/${mnt_position}
 fi
 
 ip=`ifconfig|grep "inet addr:"|grep -v "127.0.0.1"|cut -d: -f2|awk '{print $1}'`

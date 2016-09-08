@@ -21,7 +21,7 @@ limit=10 #递减下限
 #文件系统所在的设备名称
 devname=
 #lustre将要挂载的分区的索引号:devname指定的设备上的分区
-devindex=8
+devindex=
 #mds 的ip
 mdsnode=
 #
@@ -40,6 +40,10 @@ function main()
 				mdsnode=${1#*=}
 				shift
 				;;
+			--devindex=?*)
+				devindex=${1#*=}
+				shift
+				;;
 			-?*)
                 printf 'WARN: Unknown option (ignored): %s\n' "(" >&2")"
                 shift
@@ -51,13 +55,18 @@ function main()
 	done
 	#处理参数缺省情况,devname和mdsnode都是不可缺省的，只有二者都给出方能正确运行，否则非正常终止程序
 	if [ ! -n "${devname}" ]; then
-		echo "MULTEXU ERROR:the parameter --devname is necessary..."
-		#exit 1;
+		print_message "MULTEXU_ERROR" "the parameter --devname is necessary..."
+		exit 1;
 	fi
 	
 	if [ ! -n "${mdsnode}" ]; then
-		echo "MULTEXU ERROR:the parameter --mdsnode is necessary..."
-		#exit 1;
+		print_message "MULTEXU_ERROR" "the parameter --mdsnode is necessary..."
+		exit 1;
+	fi
+	
+	if [ ! -n "${devindex}" ]; then
+		print_message "MULTEXU_ERROR" "the parameter --devindex is necessary..."
+		exit 1;
 	fi
 }
 
@@ -105,7 +114,7 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_ssh_enabled=nodes_all.o
 
 
 #在server node 分区
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_server.out --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__auto_parted.sh ${devname}"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_server.out --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__auto_parted.sh ${devname} ${devindex}"
 ssh_check_cluster_status "nodes_server.out" "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
 print_message "MULTEXU_INFO" "the nodes which its ip in nodes_server.out finished to part ${devname}${devindex}..."
 #清除信号量  避免干扰
@@ -139,7 +148,7 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_server.out --cmd="sh ${M
 
 #配置oss node
 print_message "MULTEXU_INFO" "configure oss nodes..."
-sh ${MULTEXU_BATCH_DEPLOY_DIR}/_configure_ossnode.sh -s ${mdsnode} -d ${devname}${devindex} -m ost
+sh ${MULTEXU_BATCH_DEPLOY_DIR}/_configure_ossnode.sh "-s ${mdsnode} -d ${devname}${devindex} -m ost"
 ssh_check_cluster_status "nodes_oss.out" "${MULTEXU_STATUS_EXECUTE}"  $((sleeptime/4)) "${limit}"
 print_message "MULTEXU_INFO" "finished configuring oss nodes ..."
 #清除信号量  避免干扰

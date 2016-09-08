@@ -52,7 +52,7 @@ wait
 
 
 if [ ! -d "/mnt/${mnt_position}" ]; then
-	mkdir /mnt/${mnt_position}
+    mkdir /mnt/${mnt_position}
 fi
 
 mount -t lustre ${devname} /mnt/$mnt_position;

@@ -64,12 +64,44 @@ print_message "MULTEXU_INFO" "install dependencies..."
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/slang-devel-2.2.4-11.el7.x86_64.rpm
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/asciidoc-8.6.8-5.el7.noarch.rpm
 yum --nogpgcheck localinstall ${MULTEXU_SOURCE_DIR}/build/newt-devel-0.52.15-4.el7.x86_64.rpm ${MULTEXU_SOURCE_DIR}/build/slang-devel-2.2.4-11.el7.x86_64.rpm  ${MULTEXU_SOURCE_DIR}/build/asciidoc-8.6.8-5.el7.noarch.rpm 
-
+sleep ${sleeptime}s
 yum -y groupinstall "Development Tools"
-wait
-yum -y install xmlto && yum -y install asciidoc && yum -y install elfutils-libelf-devel && yum -y install zlib-devel && yum -y install binutils-devel && yum -y install newt-devel && yum -y install  python-devel && yum -y install  hmaccalc && yum -y install  perl-ExtUtils-Embed  && yum -y install python-docutils && yum -y install elfutils-devel && yum -y install audit-libs-devel && yum -y install libselinux-devel && ncurses-devel &&yum -y install pesign && yum -y install numactl-devel &&yum -y install pciutils-devel 
-wait
+sleep ${sleeptime}s
+yum -y install xmlto 
+`${PAUSE_CMD}`
+yum -y install asciidoc 
+`${PAUSE_CMD}`
+yum -y install elfutils-libelf-devel 
+`${PAUSE_CMD}`
+yum -y install zlib-devel 
+`${PAUSE_CMD}`
+yum -y install binutils-devel
+`${PAUSE_CMD}`
+yum -y install newt-devel 
+`${PAUSE_CMD}`
+yum -y install python-devel 
+`${PAUSE_CMD}`
+yum -y install hmaccalc 
+`${PAUSE_CMD}`
+yum -y install perl-ExtUtils-Embed  
+`${PAUSE_CMD}`
+yum -y install python-docutils 
+`${PAUSE_CMD}`
+yum -y install elfutils-devel 
+`${PAUSE_CMD}`
+yum -y install audit-libs-devel 
+`${PAUSE_CMD}`
+yum -y install libselinux-devel 
+`${PAUSE_CMD}`
+yum -y install ncurses-devel 
+`${PAUSE_CMD}`
+yum -y install pesign 
+yum -y install numactl-dev
+`${PAUSE_CMD}`el 
+yum -y install pciutils-devel 
+`${PAUSE_CMD}`
 yum -y install quilt
+sleep ${sleeptime}s
 wait
 
 #wget https://mirrors.ustc.edu.cn/fedora/epel/7/x86_64/e/epel-release-7-8.noarch.rpm
@@ -88,8 +120,7 @@ print_message "MULTEXU_INFO" "Now start to rpmbuild kernel ..."
 
 cd "${BUILD_BASE_DIR}"
 rpmbuild -bp --target=`uname -m` ./SPECS/kernel.spec
-wait
-rpmbuild -bp --target=`uname -m` ./SPECS/lustre.spec
+sleep ${sleeptime}s
 wait
 
 #
@@ -120,12 +151,6 @@ print_message "MULTEXU_INFO" "now start to patch the kernel ..."
 quilt push -av
 #quilt push -av的代替命令：for PATCH in $(cat series); do patch -p1 < patches/$PATCH; done
 `${PAUSE_CMD}`
-
-cd "${BUILD_BASE_DIR}"/BUILD/lustre-2.8.0/
-print_message "MULTEXU_INFO" "now start to patch the lustre ..."
-patch -p1 < ${MULTEXU_SOURCE_DIR}/build/lustre_nrs_sscdt.patch
-`${PAUSE_CMD}`
-
 cd "${BUILD_BASE_DIR}"/BUILD/kernel-3.10.0-327.3.1.el7/linux-3.10.0-327.3.1.el7.x86_64/
 #make oldconfig || make menuconfig
 #make include/asm
@@ -134,19 +159,20 @@ cd "${BUILD_BASE_DIR}"/BUILD/kernel-3.10.0-327.3.1.el7/linux-3.10.0-327.3.1.el7.
 #make include/linux/utsrelease.h
 #make rpm
 print_message "MULTEXU_INFO" "now start to make rpm(new kernel)..."
-read -p "choose default .config to continue to execute the command[make -j8 rpm] ?(y/n):" -t 5 choose
+read -p "choose default .config to continue to execute the command[make -j8 rpm] ?(y/n):" -t 10 choose
 if [[ "${choose}" =~ ^n.*$ || "${choose}" =~ ^N.*$  ]];then
 	exit 0;
 fi
 #make oldconfig
-make -j8 rpm
+make -j4 rpm
 
 print_message "MULTEXU_INFO" "finished to make rpm(new kernel)..."
 print_message "MULTEXU_INFO" "please execute the following command manually..."
 print_message "MULTEXU_INFO" "1. rpm -ivh --force kernel-3.10.0_3.10.0_327.3.1.el7_lustre.x86_64-1.x86_64.rpm"
+#ls  /boot/  ==> System.map-3.10.0-3.10.0-327.3.1.el7_lustre.x86_64  ==> 3.10.0-3.10.0-327.3.1.el7_lustre.x86_64
 print_message "MULTEXU_INFO" "2. /sbin/new-kernel-pkg --package kernel --mkinitrd --dracut --depmod --install 3.10.0-3.10.0-327.3.1.el7_lustre.x86_64"
 print_message "MULTEXU_INFO" "3. reboot"
-print_message "MULTEXU_INFO" "now you can run the script build_lustre.sh..."
+print_message "MULTEXU_INFO" "now you can run the script build_lustre[server/client].sh..."
 
 exit 0
 

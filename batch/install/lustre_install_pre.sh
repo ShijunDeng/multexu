@@ -17,7 +17,7 @@ fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
 
-sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 print_message "MULTEXU_INFO" "set SELINUX=disabled"
 systemctl stop firewalld
 #systemctl stop firewalld.service && sudo systemctl disable firewalld.service
