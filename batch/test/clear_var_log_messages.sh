@@ -27,7 +27,7 @@ fi
 while [[ count -lt ${count_limit} ]]
 do
     echo '' > ${VAR_LOG_DIR}/messages
-    print_message "MULTEXU_INFO" " "the ${count} time clear ${VAR_LOG_DIR}/messages"
+    print_message "MULTEXU_INFO"  "the ${count} time clear ${VAR_LOG_DIR}/messages"
     let count+=1
     sleep 3600s
 done

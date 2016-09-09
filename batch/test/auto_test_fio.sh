@@ -23,20 +23,20 @@ limit=10 #递减下限
 
 #测试参数
 #test parameters
-blocksize=1;#the blocksize
+blocksize=1 #the blocksize
 directory="/mnt/lustre/test"
 direct=0
 iodepth=5
 allow_mounted_write=1
 ioengine="psync"
 special_cmd_randIO='-rwmixread=70' #随机IO时的一些特殊参数
-size="128M"
-numjobs=4
-runtime=90
-name="ascar_test"
+size="512M"
+numjobs=10
+runtime=180
+name="sscdt_test"
 
-blocksize_start=1
-blocksize_end=4
+blocksize_start=4
+blocksize_end=1024
 blocksize_multi_step=2
 #设置检测测试是否结束的时间以及检测的下限
 checktime_init=180
@@ -56,14 +56,14 @@ client_ip=
 policy=
 #调度算法的名称noop anticipatory [deadline] cfq tb new_sysdeadline
 declare -a policy_name
-policy_name[0]='crrn pid'
-policy_name[1]='orr pid'
-policy_name[2]='tbf jobid'
-policy_name[2]='scdt'
+policy_name[0]="crrn pid"
+policy_name[1]="orr pid"
+policy_name[2]="tbf jobid"
+policy_name[3]="sscdt"
 #标识ascar是否启用
 
 #获取参数值
-function main()
+function get_parameter()
 {
     while :; 
     do
@@ -86,6 +86,7 @@ function main()
         esac
     done
 }
+get_parameter $@
 
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_available=nodes_all.out
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_ssh_enabled=nodes_all.out
@@ -103,7 +104,7 @@ done
 #安装fio
 #
 print_message "MULTEXU_INFO" "now start to check fio tool in client nodes..."
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_TEST_DIR}/fio_install.sh"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --supercmd="sh ${MULTEXU_BATCH_TEST_DIR}/fio_install.sh"
 ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}" $((sleeptime/4)) ${limit}
 print_message "MULTEXU_INFO" "finished fio checking..."
 `${PAUSE_CMD}`
@@ -113,7 +114,6 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${M
 #
 #删除oss上因为测试产生的文件和测试目录
 #
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rmdir /mnt/lustre/test/"
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -rf /mnt/lustre/test"
 sleep ${sleeptime}s
 #建立测试目录
@@ -157,7 +157,7 @@ do
                 special_cmd_randio_choice=${special_cmd_randIO}
             fi
 
-            cmdvar="${MULTEXU_SOURCE_DIR}/fio/fio -directory=${directory} -direct=${direct} -iodepth ${iodepth} -thread -rw=${rw_pattern} ${special_cmd_randio_choice} -allow_mounted_write=${allow_mounted_write} -ioengine=${ioengine} -bs=${blocksize}k -size=${size} -numjobs=${numjobs} -runtime=${runtime} -group_reporting -name=${name} "
+            cmdvar="${MULTEXU_SOURCE_DIR}/tool/fio/fio -directory=${directory} -direct=${direct} -iodepth ${iodepth} -thread -rw=${rw_pattern} ${special_cmd_randio_choice} -allow_mounted_write=${allow_mounted_write} -ioengine=${ioengine} -bs=${blocksize}k -size=${size} -numjobs=${numjobs} -runtime=${runtime} -group_reporting -name=${name} "
             print_message "MULTEXU_INFO" "test command[${cmdvar}]"
             #删除测试文件
             sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f /mnt/lustre/test/*"

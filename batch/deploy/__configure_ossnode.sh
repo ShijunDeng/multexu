@@ -1,7 +1,7 @@
 #!/bin/bash
 # POSIX
 #
-#description:    configure mdsnode automatically
+#description:    configure mgsnode automatically
 #     author:    ShijunDeng
 #      email:    dengshijun1992@gmail.com
 #       time:    2016-07-25
@@ -25,12 +25,13 @@ index=
 #挂载位置
 mnt_position=
 #mdsnode的ip地址
-mdsnode=
+mgsnode=
 
-while getopts 's:d:i:m' opt;do
+while getopts 's:d:i:m:' opt;
+do
     case $opt in
     s)
-        mdsnode=$OPTARG;;
+        mgsnode=$OPTARG;;
     d)
         devname=$OPTARG;;
     i)
@@ -39,24 +40,28 @@ while getopts 's:d:i:m' opt;do
         mnt_position=$OPTARG;;
     esac
 done
-
-if [ ! -n ${mdsnode} ] || [ ! -n ${devname} ] || [ ! -n ${index} ] || [ ! -n ${mnt_position} ]; then
+if [ ! -n ${mgsnode} ] || [ ! -n ${devname} ] || [ ! -n ${index} ] || [ ! -n ${mnt_position} ]; then
     print_message "MULTEXU_ERROR" "-s|-d|-i|-m is necessary..."
     exit 1
 fi
+#
+#若给出的mnt_position为ost index 为0 ，则实际上挂载点设置mnt_position为ost0
+#
+mnt_position="${mnt_position}${index}"
+ip=`ifconfig|grep "inet addr:"|grep -v "127.0.0.1"|cut -d: -f2|awk '{print $1}'`
+`${PAUSE_CMD}`
 
-ip=`ifconfig|grep "inet addr:"|grep -v "127.0.0.1"|cut -d: -f2|awk '{print $1}'`;
 #
-#这里注意参数的名字不一致 mgsnode=mdsnode
+#这里注意参数的名字一致 mgsnode=mgsnode
 #
-mkfs.lustre --fsname=lustrefs --mgsnode=$mdsnode@tcp --ost --index=$index $devname
+mkfs.lustre --fsname=lustrefs --mgsnode=$mgsnode@tcp --ost --index=$index $devname
 wait
 
-if [ ! -d "/mnt/${mnt_position}${index}" ]; then
-    mkdir /mnt/${mnt_position}${index}
+if [ ! -d "/mnt/${mnt_position}" ]; then
+    mkdir "/mnt/${mnt_position}"
 fi
 
-mount -t lustre ${devname} /mnt/${mnt_position}${index}
+mount -t lustre ${devname} "/mnt/${mnt_position}"
 wait
 modprobe lustre
 wait

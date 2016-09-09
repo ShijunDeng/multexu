@@ -1,7 +1,7 @@
 #!/bin/bash
 # POSIX
 #
-#description:    configure mdsnode automatically
+#description:    configure mgsnode automatically
 #     author:    ShijunDeng
 #      email:    dengshijun1992@gmail.com
 #       time:    2016-07-25

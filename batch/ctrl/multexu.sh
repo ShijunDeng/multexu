@@ -146,7 +146,7 @@ function show_help()
 #
 #接受参数，调用相应函数执行
 #
-function main()
+function get_parameters()
 {
     local filenames=""  #文件名称，以逗号隔开
     local location=""  #文件保存位置
@@ -261,7 +261,7 @@ function main()
 
 #####################
 
-main $@
+get_parameters $@
 
 ###reset
 ip_array=

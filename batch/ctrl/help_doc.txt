@@ -34,7 +34,8 @@
 				-s=/usr/src/multexu,/usr/src/test.sh or -sendfile=/usr/src/multexu,/usr/src/test.sh
 			注意该参数总是和-l,--location一起使用
 				参见-l,--location
-			
+		--supercmd
+			复杂的命令，该参数必须放在最后，目前不建议使用
 		-v,--version
 			输出版本信息
 		

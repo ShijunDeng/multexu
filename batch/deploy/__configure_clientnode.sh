@@ -17,13 +17,13 @@ fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
 mnt_position=
-mdsnode=
+mgsnode=
 
 while getopts 's:m:' opt;
 do
     case $opt in
         s)
-                mdsnode=$OPTARG;;
+                mgsnode=$OPTARG;;
         m)
                 mnt_position=$OPTARG;;
     esac
@@ -34,8 +34,8 @@ if [ ! -d "/mnt/${mnt_position}" ]; then
 fi
 
 ip=`ifconfig|grep "inet addr:"|grep -v "127.0.0.1"|cut -d: -f2|awk '{print $1}'`
-print_message "MULTEXU_INFO" "client [${ip}] mount -t lustre ${mdsnode}@tcp:/lustrefs /mnt/${mnt_position}"
-mount -t lustre ${mdsnode}@tcp:/lustrefs /mnt/${mnt_position}
+print_message "MULTEXU_INFO" "client [${ip}] mount -t lustre ${mgsnode}@tcp:/lustrefs /mnt/${mnt_position}"
+mount -t lustre ${mgsnode}@tcp:/lustrefs /mnt/${mnt_position}
 wait
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
