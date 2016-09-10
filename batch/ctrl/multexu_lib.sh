@@ -119,6 +119,10 @@ function ssh_check_cluster_status()
 #
 #输出程序的提示信息
 #参数：消息类型  消息内容
+#MULTEXU_INFO 普通信息
+#MULTEXU_ERROR 错误
+#MULTEXU_WARN 警告信息
+#MULTEXU_ECHO 输出不带标志,直接封装echo,和echo效果一样
 #
 function print_message()
 {
@@ -128,6 +132,9 @@ function print_message()
         MULTEXU_INFO|MULTEXU_ERROR|MULTEXU_WARN)
             echo "${message_type}:$@"
             ;;
+        MULTEXU_ECHO)
+            echo "$@"
+           ;;		
     esac
 }
 

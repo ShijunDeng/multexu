@@ -107,7 +107,7 @@ function test_host_ssh_enabled()
 
 }
 
-function main()
+function get_parameters()
 {
     local parameter_name=$1
     local parameter_value=${1#*=}
@@ -131,4 +131,4 @@ function main()
     esac
 } 
 
-main $@
+get_parameters $@
