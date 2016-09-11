@@ -32,8 +32,6 @@ done
 if [ ! -d "/mnt/${mnt_position}" ]; then
     mkdir /mnt/${mnt_position}
 fi
-
-ip=`ifconfig|grep "inet addr:"|grep -v "127.0.0.1"|cut -d: -f2|awk '{print $1}'`
 print_message "MULTEXU_INFO" "client [${ip}] mount -t lustre ${mgsnode}@tcp:/lustrefs /mnt/${mnt_position}"
 mount -t lustre ${mgsnode}@tcp:/lustrefs /mnt/${mnt_position}
 wait

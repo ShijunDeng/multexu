@@ -36,6 +36,7 @@ then
     ./configure --enable-gfio
     make fio
     make gfio
+	wait
 fi
 
 #置入执行信号量 代表fio安装完成

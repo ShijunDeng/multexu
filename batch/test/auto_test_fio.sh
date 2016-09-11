@@ -31,8 +31,8 @@ directory="/mnt/lustre/test"
 direct=0
 iodepth=5
 allow_mounted_write=1
-ioengine="psync"
-special_cmd_randIO='-rwmixread=70' #随机IO时的一些特殊参数
+ioengine="libaio"
+special_cmd='-rwmixread=70' #随机IO时的一些特殊参数
 size="1G"
 numjobs=10
 runtime=180
@@ -75,12 +75,12 @@ function get_parameter()
     while :; 
     do
         case $1 in
-            -r=?*|--random=?*) #对于randomIO的特殊附加命令
-                special_cmd_randIO=${1#*=}
+            -f=?*|--fio_cmd=?*) #特殊附加命令
+                special_cmd=${1#*=}
                 shift
                 ;;
-            -r|--random=) # Handle the case of an empty 
-                printf 'MULTEXU ERROR: "-c|--cmd" requires a non-empty option argument.\n' >&2
+            -f|--fio_cmd=) # Handle the case of an empty 
+                printf 'MULTEXU ERROR: "-f|--fio_cmd" requires a non-empty option argument.\n' >&2
                 exit 1
                 ;;
             -?*)
@@ -112,7 +112,7 @@ done
 #
 print_message "MULTEXU_INFO" "now start to check fio tool in client nodes..."
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --supercmd="sh ${MULTEXU_BATCH_TEST_DIR}/fio_install.sh"
-ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}" $((sleeptime/4)) ${limit}
+ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}" $((sleeptime/2)) ${limit}
 print_message "MULTEXU_INFO" "finished fio checking..."
 `${PAUSE_CMD}`
 #清除信号量  避免干扰
@@ -160,13 +160,13 @@ do
         do
             print_message "MULTEXU_ECHO" "		start a test..."   
 			
-            special_cmd_randio_choice=
+            special_cmd_io_choice=
 			
-            if [[ ${rw_pattern} =~ "rand" ]] ;then
-                special_cmd_randio_choice=${special_cmd_randIO}
+            if [[ ${rw_pattern} == "readwrite" ]] || [[ ${rw_pattern} == "randrw" ]];then
+                special_cmd_io_choice=${special_cmd}
             fi
 
-            cmdvar="${MULTEXU_SOURCE_DIR}/tool/fio/fio -directory=${directory} -direct=${direct} -iodepth ${iodepth} -thread -rw=${rw_pattern} ${special_cmd_randio_choice} -allow_mounted_write=${allow_mounted_write} -ioengine=${ioengine} -bs=${blocksize}k -size=${size} -numjobs=${numjobs} -runtime=${runtime} -group_reporting -name=${name} "
+            cmdvar="${MULTEXU_SOURCE_DIR}/tool/fio/fio -directory=${directory} -direct=${direct} -iodepth ${iodepth} -thread -rw=${rw_pattern} ${special_cmd_io_choice} -allow_mounted_write=${allow_mounted_write} -ioengine=${ioengine} -bs=${blocksize}k -size=${size} -numjobs=${numjobs} -runtime=${runtime} -group_reporting -name=${name} "
             print_message "MULTEXU_ECHO" "		test command:${cmdvar}"
             #删除测试文件
             sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f /mnt/lustre/test/*"
@@ -187,13 +187,13 @@ do
             ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}" ${checktime_init} ${checktime_lower_limit}
             #清除标记
             sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"            
-            print_message "MULTEXU_INFO" "		finish this test..."
+            print_message "MULTEXU_ECHO" "		finish this test..."
             `${PAUSE_CMD}`
         done #blocksize
     done #rw_pattern
 done #policy
 
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
 #清除测试产生的垃圾文件
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f /mnt/lustre/test/*"
 `${PAUSE_CMD}`
