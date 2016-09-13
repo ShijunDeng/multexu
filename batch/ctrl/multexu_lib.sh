@@ -36,8 +36,9 @@ function send_execute_statu_signal()
 function clear_execute_statu_signal()
 {
     if [ ! -f "${EXECUTE_STATUS_SIGNAL}" ]; then
-        echo "" > "${EXECUTE_STATUS_SIGNAL}"
+	    touch "${EXECUTE_STATUS_SIGNAL}"
     fi
+        echo "" > "${EXECUTE_STATUS_SIGNAL}"	
 }
 
 #

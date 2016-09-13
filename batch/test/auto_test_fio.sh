@@ -24,25 +24,29 @@ time_syn_clock=192.168.3.104
 sleeptime=20 #设置检测的睡眠时间
 limit=10 #递减下限
 
+#测试结果存放目录
+result_dir="testResult"
+
 #测试参数
 #test parameters
 blocksize=1 #the blocksize
+#测试目录
 directory="/mnt/lustre/test"
 direct=0
 iodepth=5
 allow_mounted_write=1
 ioengine="libaio"
-special_cmd='-rwmixread=70' #随机IO时的一些特殊参数
-size="1G"
-numjobs=10
-runtime=180
+special_cmd='-rwmixread=50' #随机IO时的一些特殊参数
+size="2G"
+numjobs=20
+runtime=900
 name="sscdt_test"
 
 blocksize_start=1
 blocksize_end=2048
 blocksize_multi_step=2
 #设置检测测试是否结束的时间以及检测的下限
-checktime_init=180
+checktime_init=900
 checktime_lower_limit=60
 #IO方式
 declare -a rw_array;#Type of I/O pattern. 
@@ -121,19 +125,19 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${M
 #
 #删除oss上因为测试产生的文件和测试目录
 #
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -rf /mnt/lustre/test"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -rf ${directory}"
 sleep ${sleeptime}s
 #建立测试目录
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="mkdir /mnt/lustre/test/"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="mkdir ${directory}/"
 #设置lustre的stripe
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="lfs setstripe -c -1 /mnt/lustre/test"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="lfs setstripe -c -1 ${directory}"
 print_message "MULTEXU_INFO" "all ost have been used..."
 `${PAUSE_CMD}`
 
 cd ${MULTEXU_BATCH_TEST_DIR}/
 print_message "MULTEXU_INFO" "enter directory ${MULTEXU_BATCH_TEST_DIR}..."
 `${PAUSE_CMD}`
-rm -rf testResult
+rm -rf "${result_dir}"
 
 #定时清除服务器上的日志,因为测试的过程中会产生大量的日志,很可能会占用大量的日志空间或者影响服务器的性能
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_TEST_DIR}/clear_var_log_messages.sh"
@@ -150,7 +154,7 @@ do
     for rw_pattern in ${rw_array[*]}
     do
         #测试结果的存放目录
-		dirname="testResult/${rw_pattern}"
+		dirname="${result_dir}/${rw_pattern}"
 		
         if [ ! -d "${dirname}" ]; then
             mkdir -p ${dirname};
@@ -169,7 +173,7 @@ do
             cmdvar="${MULTEXU_SOURCE_DIR}/tool/fio/fio -directory=${directory} -direct=${direct} -iodepth ${iodepth} -thread -rw=${rw_pattern} ${special_cmd_io_choice} -allow_mounted_write=${allow_mounted_write} -ioengine=${ioengine} -bs=${blocksize}k -size=${size} -numjobs=${numjobs} -runtime=${runtime} -group_reporting -name=${name} "
             print_message "MULTEXU_ECHO" "		test command:${cmdvar}"
             #删除测试文件
-            sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f /mnt/lustre/test/*"
+            sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f ${directory}/*"
 			
 			####时间同步
             sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="rdate -s ${time_syn_clock}"
@@ -195,7 +199,7 @@ done #policy
 
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
 #清除测试产生的垃圾文件
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f /mnt/lustre/test/*"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${client_ip} --cmd="rm -f ${directory}/*"
 `${PAUSE_CMD}`
 
 print_message "MULTEXU_INFO" "all test jobs has been finished..."
