@@ -1,0 +1,40 @@
+#多节点批量删除文件
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='rm -rf /usr/src/ascar'
+#多节点批量传送文件
+sh ctrl/multexu.sh --iptable=nodes_all.out --sendfile=/usr/src/ascar --location=/usr/src
+#部署文件系统
+sh deploy/auto_lustre2.8.0_deploy.sh --mgsnode=192.168.3.186 --devname=/dev/sda --devindex=7
+
+#多节点批量删除旧版内核,谨慎使用
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='rpm -aq | grep kernel'
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='rpm -e kernel-2.6.32504.8.1.el6_lustre.x86_64-1.x86_64 -f --nodeps'
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='yum -y remove kernel-2.6.32504.8.1.el6_lustre.x86_64-1.x86_64'
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='yum -y remove kernel-firmware-2.6.32-358.el6.noarch'
+
+#多节点批量重启
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd=reboot
+#停掉节点中的fio进程
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd="kill -9 $(pidof fio)"
+
+#多节点批量删除文件
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='rm -rf /home/sscdt/Feedback-driven-Monitor'
+#多节点批量建立文件夹
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='mkdir /home/sscdt'
+#多节点批量传送文件
+sh ctrl/multexu.sh --iptable=nodes_all.out --sendfile=/home/sscdt/Feedback-driven-Monitor --location=/home/sscdt/
+#多节点批量传送文件
+sh ctrl/multexu.sh --iptable=nodes_all.out --sendfile=/home/centos/Development/project/Feedback-driven-Monitor --location=/home/centos/Development/
+sh ctrl/multexu.sh --iptable=nodes_all.out --sendfile=/home/centos/Development/project/Feedback-driven-Monitor --location=/home/centos/Development/
+
+cd /home/centos/Development/project/Feedback-driven-Monitor/batch/
+sh ctrl/multexu.sh --iptable=nodes_all.out --cmd='cat /home/centos/Development/project/Feedback-driven-Monitor/batch/config/multexu.tmp'
+
+sh ctrl/multexu.sh --iptable=nodes_all.out --sendfile=/home/centos/Development/project/Feedback-driven-Monitor --location=/home/centos/Development/project
+
+#lustre 单节点上文件系统部署相关命令
+mkfs.lustre --fsname=lustrefs --mgs --mdt --index=0 /dev/sda3
+mkfs.lustre --fsname=lustrefs --mgsnode=192.168.3.186@tcp --ost --index=0 /dev/sda7
+mount -t lustre /dev/sda3 /mnt/lustre
+mkdir /mnt/ost1 && mount -t lustre /dev/sda7 /mnt/ost1/
+#xshell传送文件软件安装
+yum install lrzsz
