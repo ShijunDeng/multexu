@@ -96,8 +96,8 @@ yum -y install libselinux-devel
 yum -y install ncurses-devel 
 `${PAUSE_CMD}`
 yum -y install pesign 
-yum -y install numactl-dev
-`${PAUSE_CMD}`el 
+yum -y install numactl-devel 
+`${PAUSE_CMD}`
 yum -y install pciutils-devel 
 `${PAUSE_CMD}`
 yum -y install quilt

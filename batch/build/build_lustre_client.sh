@@ -74,8 +74,8 @@ yum -y install libselinux-devel
 yum -y install ncurses-devel 
 `${PAUSE_CMD}`
 yum -y install pesign 
-yum -y install numactl-dev
-`${PAUSE_CMD}`el 
+yum -y install numactl-devel 
+`${PAUSE_CMD}`
 yum -y install pciutils-devel 
 `${PAUSE_CMD}`
 yum -y install quilt
@@ -96,18 +96,17 @@ rpmbuild -bp --target=`uname -m` ./SPECS/lustre.spec
 sleep ${sleeptime}s
 wait
 
-
 cd "${BUILD_BASE_DIR}"/BUILD/lustre-2.8.0/
+print_message "MULTEXU_INFO" "now start to patch files for metric ..."
+sh ${MULTEXU_BATCH_BUILD_DIR}/_patch_metric.sh
+`${PAUSE_CMD}`
+
 print_message "MULTEXU_INFO" "now start to patch the lustre ..."
 patch -p1 < ${MULTEXU_SOURCE_DIR}/build/lustre_nrs_sscdt.patch
 `${PAUSE_CMD}`
 
 #注意--with-linux指定的位置
 ./configure --with-linux="${BUILD_BASE_DIR}"/BUILD/kernel-3.10.0_3.10.0_327.3.1.el7_lustre.x86_64/ --disable-server  
-make rpms -j8
-print_message "MULTEXU_INFO" "finished to make rpms (client) ..."
-`${PAUSE_CMD}`
-./configure 
 make rpms -j8
 print_message "MULTEXU_INFO" "finished to make rpms (client) ..."
 `${PAUSE_CMD}`
