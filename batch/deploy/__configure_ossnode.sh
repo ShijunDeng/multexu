@@ -1,7 +1,7 @@
 #!/bin/bash
 # POSIX
 #
-#description:    configure mgsnode automatically
+#description:    configure mdsnode automatically
 #     author:    ShijunDeng
 #      email:    dengshijun1992@gmail.com
 #       time:    2016-07-25
@@ -25,13 +25,13 @@ index=
 #挂载位置
 mnt_position=
 #mdsnode的ip地址
-mgsnode=
+mdsnode=
 
 while getopts 's:d:i:m:' opt;
 do
     case $opt in
     s)
-        mgsnode=$OPTARG;;
+        mdsnode=$OPTARG;;
     d)
         devname=$OPTARG;;
     i)
@@ -40,7 +40,7 @@ do
         mnt_position=$OPTARG;;
     esac
 done
-if [ ! -n ${mgsnode} ] || [ ! -n ${devname} ] || [ ! -n ${index} ] || [ ! -n ${mnt_position} ]; then
+if [ ! -n ${mdsnode} ] || [ ! -n ${devname} ] || [ ! -n ${index} ] || [ ! -n ${mnt_position} ]; then
     print_message "MULTEXU_ERROR" "-s|-d|-i|-m is necessary..."
     exit 1
 fi
@@ -52,9 +52,9 @@ ip=`ifconfig|grep "inet addr:"|grep -v "127.0.0.1"|cut -d: -f2|awk '{print $1}'`
 `${PAUSE_CMD}`
 
 #
-#这里注意参数的名字一致 mgsnode=mgsnode
+#这里注意参数的名字一致 mdsnode=mdsnode
 #
-mkfs.lustre --fsname=lustrefs --mgsnode=$mgsnode@tcp --ost --index=$index $devname
+mkfs.lustre --fsname=lustrefs --mdsnode=$mdsnode@tcp --ost --index=$index $devname
 wait
 
 if [ ! -d "/mnt/${mnt_position}" ]; then

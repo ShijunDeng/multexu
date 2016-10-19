@@ -19,7 +19,7 @@ source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
                                                                  
 print_message "MULTEXU_INFO" "install dependencies..."                                       
 cd "${MULTEXU_SOURCE_DIR}"/install
-echo "MULTEXU INFO:enter directory ${MULTEXU_SOURCE_DIR}/install..."
+print_message "MULTEXU_INFO" "enter directory ${MULTEXU_SOURCE_DIR}/install..."
 
 rpm -ivh lustre-client-modules?*.rpm --nodeps --force
 wait

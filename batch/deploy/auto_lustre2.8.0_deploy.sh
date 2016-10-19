@@ -23,7 +23,7 @@ devname=
 #lustre将要挂载的分区的索引号:devname指定的设备上的分区
 devindex=
 #mds 的ip
-mgsnode=
+mdsnode=
 #
 
 #获取参数值
@@ -36,8 +36,8 @@ function get_parameters()
 				devname=${1#*=}
 				shift
 				;;
-			--mgsnode=?*)
-				mgsnode=${1#*=}
+			--mdsnode=?*)
+				mdsnode=${1#*=}
 				shift
 				;;
 			--devindex=?*)
@@ -59,8 +59,8 @@ function get_parameters()
 		exit 1;
 	fi
 	
-	if [ ! -n "${mgsnode}" ]; then
-		print_message "MULTEXU_ERROR" "the parameter --mgsnode is necessary..."
+	if [ ! -n "${mdsnode}" ]; then
+		print_message "MULTEXU_ERROR" "the parameter --mdsnode is necessary..."
 		exit 1;
 	fi
 	
@@ -145,16 +145,16 @@ print_message "MULTEXU_INFO" "the nodes which its ip in nodes_all.out closed the
 
 
 #配置mgs node
-print_message "MULTEXU_INFO" "configure mgsnode[${mgsnode}] ..."
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${mgsnode} --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_mdsnode.sh -d ${devname}${devindex} -i 0 -m mdt"
-ssh_check_singlenode_status "${mgsnode}" "${MULTEXU_STATUS_EXECUTE}"  $((sleeptime/4)) "${limit}"
-print_message "MULTEXU_INFO" "finished configuring mgsnode[${mgsnode}] ..."
+print_message "MULTEXU_INFO" "configure mdsnode[${mdsnode}] ..."
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${mdsnode} --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_mdsnode.sh -d ${devname}${devindex} -i 0 -m mdt"
+ssh_check_singlenode_status "${mdsnode}" "${MULTEXU_STATUS_EXECUTE}"  $((sleeptime/4)) "${limit}"
+print_message "MULTEXU_INFO" "finished configuring mdsnode[${mdsnode}] ..."
 #清除信号量  避免干扰
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_server.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
 
 #配置oss node
 print_message "MULTEXU_INFO" "configure oss nodes..."
-sh ${MULTEXU_BATCH_DEPLOY_DIR}/_configure_ossnode.sh -s ${mgsnode} -m ost  -d "${devname}${devindex}"
+sh ${MULTEXU_BATCH_DEPLOY_DIR}/_configure_ossnode.sh -s ${mdsnode} -m ost  -d "${devname}${devindex}"
 ssh_check_cluster_status "nodes_oss.out" "${MULTEXU_STATUS_EXECUTE}"  $((sleeptime/4)) "${limit}"
 print_message "MULTEXU_INFO" "finished configuring oss nodes ..."
 #清除信号量  避免干扰
@@ -162,7 +162,7 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_oss.out --cmd="sh ${MULT
 
 #配置client node
 print_message "MULTEXU_INFO" "configure client nodes..."
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_clientnode.sh -s ${mgsnode} -m lustre"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_clientnode.sh -s ${mdsnode} -m lustre"
 ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}"  $((sleeptime/2)) "${limit}"
 print_message "MULTEXU_INFO" "finished configuring client nodes ..."
 #清除信号量  避免干扰

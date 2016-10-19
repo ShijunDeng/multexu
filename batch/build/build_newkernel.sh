@@ -63,7 +63,7 @@ print_message "MULTEXU_INFO" "install dependencies..."
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/newt-devel-0.52.15-4.el7.x86_64.rpm
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/slang-devel-2.2.4-11.el7.x86_64.rpm
 #wget http://mirror.centos.org/centos/7/os/x86_64/Packages/asciidoc-8.6.8-5.el7.noarch.rpm
-yum --nogpgcheck localinstall ${MULTEXU_SOURCE_DIR}/build/newt-devel-0.52.15-4.el7.x86_64.rpm ${MULTEXU_SOURCE_DIR}/build/slang-devel-2.2.4-11.el7.x86_64.rpm  ${MULTEXU_SOURCE_DIR}/build/asciidoc-8.6.8-5.el7.noarch.rpm 
+yum -y --nogpgcheck localinstall ${MULTEXU_SOURCE_DIR}/build/newt-devel-0.52.15-4.el7.x86_64.rpm ${MULTEXU_SOURCE_DIR}/build/slang-devel-2.2.4-11.el7.x86_64.rpm  ${MULTEXU_SOURCE_DIR}/build/asciidoc-8.6.8-5.el7.noarch.rpm 
 sleep ${sleeptime}s
 yum -y groupinstall "Development Tools"
 sleep ${sleeptime}s

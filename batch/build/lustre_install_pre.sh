@@ -1,10 +1,10 @@
 #!/bin/bash
 # POSIX
 #
-#description:    configure client node automatically
+#description:    pre-setting:selinux client-aliveinterval 
 #     author:    ShijunDeng
 #      email:    dengshijun1992@gmail.com
-#       time:    2016-07-25
+#       time:    2016-07-24
 #
 #initialization
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
@@ -16,26 +16,21 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
-mnt_position=
-mdsnode=
 
-while getopts 's:m:' opt;
-do
-    case $opt in
-        s)
-                mdsnode=$OPTARG;;
-        m)
-                mnt_position=$OPTARG;;
-    esac
-done
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
+echo "MULTEXU INFO:set SELINUX=disabled"
 
-if [ ! -d "/mnt/${mnt_position}" ]; then
-    mkdir /mnt/${mnt_position}
-fi
-print_message "MULTEXU_INFO" "client [${ip}] mount -t lustre ${mdsnode}@tcp:/lustrefs /mnt/${mnt_position}"
-mount -t lustre ${mdsnode}@tcp:/lustrefs /mnt/${mnt_position}
-wait
+chkconfig iptables off;
+echo "MULTEXU INFO:disable iptables firewall... "
+service iptables stop
+echo "MULTEXU INFO:service iptables stoped ..."
+
+#yum clean metadata 
+#yum clean dbcache  
+#yum makecache
+
+echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config
+
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
-exit 0
-
+echo "MULTEXU INFO:leave directory $( dirname "${BASH_SOURCE[0]}" )"

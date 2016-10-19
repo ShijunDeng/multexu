@@ -25,7 +25,7 @@ devname=
 #挂载位置
 mnt_position=
 #mdsnode的位置
-mgsnode=
+mdsnode=
 
 #
 #获取参数
@@ -39,20 +39,20 @@ while getopts 'd:s:m:' opt;do
             mnt_position=$OPTARG
             ;;
         s)
-            mgsnode=$OPTARG
+            mdsnode=$OPTARG
             ;;
     esac
 done
 
 
-if [ ! -n ${mgsnode} ] || [ ! -n ${devname} ]  || [ ! -n ${mnt_position} ]; then
+if [ ! -n ${mdsnode} ] || [ ! -n ${devname} ]  || [ ! -n ${mnt_position} ]; then
     print_message "MULTEXU_ERROR" "-s|-d|-m is necessary..."
     exit 1
 fi
 
 for host_ip in $(cat ${MULTEXU_BATCH_CONFIG_DIR}/nodes_oss.out)
 do
-    command_var="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_ossnode.sh -i ${index} -s ${mgsnode} -d ${devname} -m ${mnt_position}"
+    command_var="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_ossnode.sh -i ${index} -s ${mdsnode} -d ${devname} -m ${mnt_position}"
     print_message "MULTEXU_INFO" "${host_ip}:${command_var}..."
     ssh -f ${host_ip} "${command_var}"
     let index++

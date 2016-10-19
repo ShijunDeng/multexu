@@ -157,7 +157,7 @@ do
 		dirname="${result_dir}/${rw_pattern}"
 		
         if [ ! -d "${dirname}" ]; then
-            mkdir -p ${dirname};
+            mkdir -p ${dirname}
         fi
 		print_message "MULTEXU_ECHO" "	rw_array:${rw_pattern}"
         for ((blocksize=${blocksize_start} ;blocksize <= ${blocksize_end}; blocksize*=${blocksize_multi_step}))
