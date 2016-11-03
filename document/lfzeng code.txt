@@ -1,0 +1,128 @@
+请帮我写段代码（OSS端的，不是客户端的）：
+获得某个OSS的I/O带宽 ---- 我真正的是希望得到其物理上最大的I/O能力，不关心其实时能力。
+如果能从系统的某个配置文件中获得这个唯一值是最好的，如果不能，只有通过统计获得某个时段的I/O能力。
+
+=====================================================================================
+    lprocfs_status.h lustre/include/lustre/
+
+    增加 一处
+    文件起始处定义即可
+
+    struct statistic_data_t {
+	/* Following fields are for calculating I/O bandwidth,
+	 * 0 for read, 1 for write */
+	long             last_req_sec[2];       /* second of last request we received */
+	__s64            bw_last_sec[2];        /* bw of last sec */
+	__s64            sum_bytes_this_sec[2]; /* cumulative bytes read within this sec */
+	__s64            max_bw[2];
+	__s64            sum_bytes_before[2];
+};
+
+=======================================================================================
+
+lprocfs_status.c lustre/obdclass/  增加两处
+
+
+1.文件起始初始化
+static struct statistic_data_t  statistic_data = {
+	.last_req_sec = {0,0},
+	.bw_last_sec = {0,0},
+	.sum_bytes_this_sec = {0,0},
+	.max_bw = {0,0},
+	.sum_bytes_before = {0,0},
+};
+
+2.替换 lprocfs_stats_seq_show 函数
+
+/* seq file export of one lprocfs counter */
+static int lprocfs_stats_seq_show(struct seq_file *p, void *v) {
+	struct lprocfs_stats		*stats	= p->private;
+	struct lprocfs_counter_header	*hdr;
+	struct lprocfs_counter		 ctr;
+	int				 idx	= *(loff_t *)v;
+	int				 rc	= 0;
+	int op = 0;
+	long long int bytes_transferred=0;
+	struct timeval now;
+	do_gettimeofday(&now);
+
+	if (idx == 0) {
+
+		rc = seq_printf(p, "%-25s %lu.%lu secs.usecs\n",
+		                "snapshot_time", now.tv_sec, now.tv_usec);
+		if (rc < 0)
+			return rc;
+	}
+
+	hdr = &stats->ls_cnt_header[idx];
+	lprocfs_stats_collect(stats, idx, &ctr);
+
+	if (ctr.lc_count == 0)
+		goto out;
+
+	rc = seq_printf(p, "%-25s "LPD64" samples [%s]", hdr->lc_name,
+	                ctr.lc_count, hdr->lc_units);
+	if (rc < 0)
+		goto out;
+
+	if ((hdr->lc_config & LPROCFS_CNTR_AVGMINMAX) && ctr.lc_count > 0) {
+		rc = seq_printf(p, " "LPD64" "LPD64" "LPD64,
+		                ctr.lc_min, ctr.lc_max, ctr.lc_sum);
+		if (rc < 0)
+			goto out;
+		if (hdr->lc_config & LPROCFS_CNTR_STDDEV)
+			rc = seq_printf(p, " "LPD64, ctr.lc_sumsquare);
+		if (rc < 0)
+			goto out;
+	}
+	rc = seq_printf(p, "\n");
+
+	if ( strcmp(hdr->lc_name,"ost_read") == 0 || strcmp(hdr->lc_name,"ost_write") ==0 ) {
+
+		op = strcmp(hdr->lc_name,"ost_read") == 0 ? 0:1;
+		bytes_transferred=ctr.lc_sum-(statistic_data.sum_bytes_before)[op];
+
+		if (likely(now.tv_sec == (statistic_data.last_req_sec)[op])) {
+
+			(statistic_data.sum_bytes_this_sec)[op] += bytes_transferred;
+			if( (statistic_data.sum_bytes_this_sec)[op] > (statistic_data.max_bw)[op] ) {
+				(statistic_data.max_bw)[op] = (statistic_data.sum_bytes_this_sec)[op];
+			}
+
+		} else if (likely(now.tv_sec == (statistic_data.last_req_sec)[op] + 1)) {
+
+			(statistic_data.bw_last_sec)[op] = (statistic_data.sum_bytes_this_sec)[op];
+			if( (statistic_data.sum_bytes_this_sec)[op] > (statistic_data.max_bw)[op] ) {
+				(statistic_data.max_bw)[op] = (statistic_data.sum_bytes_this_sec)[op];
+			}
+			(statistic_data.last_req_sec)[op] = now.tv_sec;
+			(statistic_data.sum_bytes_this_sec)[op] = bytes_transferred;
+
+		} else if (likely(now.tv_sec > (statistic_data.last_req_sec)[op] + 1)) {
+			(statistic_data.bw_last_sec)[op] = 0;
+			(statistic_data.last_req_sec)[op] = now.tv_sec;
+			(statistic_data.sum_bytes_this_sec)[op] = bytes_transferred;
+		}
+		(statistic_data.sum_bytes_before)[op] = ctr.lc_sum;
+		rc = seq_printf(p, "%s_bandwidth:"LPD64" bytes/sec      max_%s_bandwidth:"LPD64" bytes/sec\n",
+		                hdr->lc_name,(long long int )(statistic_data.bw_last_sec)[op], hdr->lc_name, (long long int )(statistic_data.max_bw)[op]);
+	}
+out:
+	return (rc < 0) ? rc : 0;
+}
+
+sleep 1200s && cp /root/kernel/rpmbuild/BUILD/lustre-2.8.0/*.rpm /home/development/Fdm-LustreQoS/source/install/ && sleep 10s && sh /home/development/Fdm-LustreQoS/batch/build/build_lustre_client.sh --skip_install_dependency=1 && sleep 900s
+
+
+
+
+
+
+
+
+
+
+
+
+
+

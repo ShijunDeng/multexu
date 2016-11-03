@@ -1,5 +1,3 @@
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.122.11 qosnode1 qosnode1
 192.168.122.12 qosnode2 qosnode2
 192.168.122.13 qosnode3 qosnode3

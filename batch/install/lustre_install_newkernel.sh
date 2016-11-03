@@ -18,7 +18,7 @@ source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
 
 print_message "MULTEXU_INFO" "install dependencies..."                                       
 print_message "MULTEXU_INFO" "enter directory $( dirname "${BASH_SOURCE[0]}" )..."
-
+clear_execute_statu_signal
 `${PAUSE_CMD}`
 
 yum -y groupinstall "Development Tools"
@@ -37,7 +37,7 @@ rpm -ivh --force kernel-3.10.0_3.10.0_327.3.1.el7_lustre.x86_64*.rpm
 wait
 /sbin/new-kernel-pkg --package kernel --mkinitrd --dracut --depmod --install 3.10.0-3.10.0-327.3.1.el7_lustre.x86_64
 wait
-clear_execute_statu_signal
+
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )"
 `${PAUSE_CMD}`

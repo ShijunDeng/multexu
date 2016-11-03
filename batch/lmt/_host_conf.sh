@@ -18,24 +18,25 @@ else
 fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
 
-hostfile="/etc/hostfile"
+#hostfile="/etc/hostfile"
 
 #配置/etc/hosts
-cat ${MULTEXU_BATCH_CONFIG_DIR}/hosts | while read hosts_line; 
-do 
-	echo "${hosts_line}" >> /etc/hosts
-done
+#cat ${MULTEXU_BATCH_CONFIG_DIR}/hosts | while read hosts_line; 
+#do 
+#	echo "${hosts_line}" >> /etc/hosts
+#done
+yes | cp ${MULTEXU_BATCH_CONFIG_DIR}/hosts /etc/
 
 #配置/etc/hostfile
-if [ ! -f "${hostfile}" ]; then
-            touch ${hostfile}
-fi
+#if [ ! -f "${hostfile}" ]; then
+            #touch ${hostfile}
+#fi
 
-cat ${MULTEXU_BATCH_CONFIG_DIR}/hostfile | while read hostfile_line; 
-do 
-	echo ${hostfile_line} >> ${hostfile}
-done
-
+#cat ${MULTEXU_BATCH_CONFIG_DIR}/hostfile | while read hostfile_line; 
+#do 
+#	echo ${hostfile_line} >> ${hostfile}
+#done
+yes | cp ${MULTEXU_BATCH_CONFIG_DIR}/hostsfile /etc/
 #设置完成标识
 clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"

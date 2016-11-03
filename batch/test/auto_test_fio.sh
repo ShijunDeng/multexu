@@ -35,25 +35,25 @@ directory="/mnt/lustre/test"
 direct=0
 iodepth=5
 allow_mounted_write=1
-ioengine="libaio"
+ioengine="sync"
 special_cmd='-rwmixread=50' #随机IO时的一些特殊参数
-size="2G"
-numjobs=20
-runtime=900
+size="1G"
+numjobs=2
+runtime=600
 name="sscdt_test"
 
 blocksize_start=1
 blocksize_end=2048
 blocksize_multi_step=2
 #设置检测测试是否结束的时间以及检测的下限
-checktime_init=900
+checktime_init=600
 checktime_lower_limit=60
 #IO方式
 declare -a rw_array;#Type of I/O pattern. 
 
 #fio的读写方式
-rw_array[0]="readwrite"
-rw_array[1]="randrw"
+rw_array[0]="randrw"
+rw_array[1]="readwrite"
 rw_array[2]="write"
 rw_array[3]="randwrite"
 rw_array[4]="read"
@@ -68,10 +68,9 @@ declare -a policy_name
 #
 #默认是以空格分割 所以用连字符先代替一下 后面再替换
 #
-policy_name[0]="sscdt"
+policy_name[0]="tbf-jobid"
 policy_name[1]="crrn-pid"
 policy_name[2]="orr-pid"
-policy_name[3]="tbf-jobid"
 
 #获取参数值
 function get_parameter()

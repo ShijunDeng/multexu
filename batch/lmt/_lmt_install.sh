@@ -32,9 +32,9 @@ wait
 sleep ${sleeptime}s
 
 if [[ "${option}" == "--server" ]];then
-	rpm –ivh lmt-server-3.1.2-1.x86_64.rpm
-elif [[ "${option}" == "--server-agent" ]]
-	rpm –ivh lmt-server-agent-3.1.2-1.x86_64.rpm   
+	rpm -ivh lmt-server-3.1.2-1.x86_64.rpm
+elif [[ "${option}" == "--server-agent" ]];then
+	rpm -ivh lmt-server-agent-3.1.2-1.x86_64.rpm   
 else
 	print_message "MULTEXU_ERROR" "unknown option:${option}"
 	exit 1

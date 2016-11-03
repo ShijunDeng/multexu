@@ -21,6 +21,8 @@ print_message "MULTEXU_INFO" "install dependencies..."
 cd "${MULTEXU_SOURCE_DIR}"/install
 print_message "MULTEXU_INFO" "enter directory ${MULTEXU_SOURCE_DIR}/install..."
 
+clear_execute_statu_signal
+
 rpm -ivh lustre-modules* --nodeps --force
 wait
 rpm -e --nodeps `rpm -qa | grep  libcom_err`
@@ -50,7 +52,9 @@ wait
 
 rpm -ivh lustre-2.8.0* --nodeps --force
 wait
-clear_execute_statu_signal
+#lustre-modules-2.8.0-3.10.0_3.10.0_327.3.1.el7_lustre.x86_64.x86_64 has missing requires of kernel = ('0', '3.10.0', '3.10.0-327.3.1.el7_lustre')
+#yum clean all &&yum update glibc glibc-headers glibc-devel nscd && yum update
+wait
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )..."
 

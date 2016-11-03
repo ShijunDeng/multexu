@@ -54,7 +54,7 @@ BUILD_BASE_DIR="$HOME""/kernel/rpmbuild"
 mkdir -p "${BUILD_BASE_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 cd kernel
-
+clear_execute_statu_signal
 print_message "MULTEXU_INFO" "install dependencies..."  
 
 #
@@ -122,7 +122,10 @@ cd "${BUILD_BASE_DIR}"
 rpmbuild -bp --target=`uname -m` ./SPECS/kernel.spec
 sleep ${sleeptime}s
 wait
-
+#这里必须这样做,因为后面要用到其下的.config文件
+rpmbuild -bp --target=`uname -m` ./SPECS/lustre.spec
+sleep ${sleeptime}s
+wait
 #
 #modify EXTRAVERSION = 
 #
@@ -159,7 +162,7 @@ cd "${BUILD_BASE_DIR}"/BUILD/kernel-3.10.0-327.3.1.el7/linux-3.10.0-327.3.1.el7.
 #make include/linux/utsrelease.h
 #make rpm
 print_message "MULTEXU_INFO" "now start to make rpm(new kernel)..."
-read -p "choose default .config to continue to execute the command[make -j8 rpm] ?(y/n):" -t 10 choose
+read -p "choose default .config to continue to execute the command[make -j4 rpm] ?(y/n):" -t 10 choose
 if [[ "${choose}" =~ ^n.*$ || "${choose}" =~ ^N.*$  ]];then
     exit 0;
 fi
@@ -173,7 +176,7 @@ print_message "MULTEXU_INFO" "1. rpm -ivh --force kernel-3.10.0_3.10.0_327.3.1.e
 print_message "MULTEXU_INFO" "2. /sbin/new-kernel-pkg --package kernel --mkinitrd --dracut --depmod --install 3.10.0-3.10.0-327.3.1.el7_lustre.x86_64"
 print_message "MULTEXU_INFO" "3. reboot"
 print_message "MULTEXU_INFO" "now you can run the script build_lustre[server/client].sh..."
-
+send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 exit 0
 
 

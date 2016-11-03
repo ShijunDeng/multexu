@@ -24,8 +24,9 @@ source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
 
 cd "${MULTEXU_SOURCE_DIR}"/lmt
 print_message "MULTEXU_INFO" "enter directory ${MULTEXU_SOURCE_DIR}/lmt..."
-
 print_message "MULTEXU_INFO" "install dependencies..."    
+#lustre-modules-2.8.0-3.10.0_3.10.0_327.3.1.el7_lustre.x86_64.x86_64 has missing requires of kernel = ('0', '3.10.0', '3.10.0-327.3.1.el7_lustre')
+#yum clean all &&yum update glibc glibc-headers glibc-devel nscd && yum update
 yum -y install libtool-ltdl-devel glibc-common libtool autoconf automake mysql-devel expat-devel openssl098e perl-Date-Manip
 wait
 sleep ${sleeptime}s

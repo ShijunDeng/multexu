@@ -16,6 +16,7 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
+clear_execute_statu_signal
 
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 print_message "MULTEXU_INFO" "set SELINUX=disabled"
@@ -43,6 +44,5 @@ print_message "MULTEXU_INFO" "service iptables stoped ..."
 
 echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config
 
-clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )"

@@ -1,7 +1,7 @@
 #!/bin/bash
 # POSIX
 #
-#description:    configure /etc/cerebro.conf
+#description:    configure /etc/cerebro.conf(configure Lustre Monitoring Tool management node automaticlly)
 #     author:    ShijunDeng
 #      email:    dengshijun1992@gmail.com
 #       time:    2016-10-19
@@ -17,14 +17,24 @@ else
 	`${PAUSE_CMD}`
 fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
+mdsnode=
 
+#
+#获取参数
+#
+while getopts 's:' opt;do
+    case $opt in
+        s)
+            mdsnode=$OPTARG
+            ;;
+    esac
+done
 #配置metric-server 
-sed -i 's/# cerebro_metric_server localhost/cerebro_metric_server ${mdsnode}/g' /etc/cerebro.conf
-
+sed -i "s/# cerebro_metric_server localhost/cerebro_metric_server ${mdsnode}/g" /etc/cerebro.conf
 #配置event-server
 for host_ip in $(cat ${MULTEXU_BATCH_CONFIG_DIR}/nodes_server.out)
 do
-    echo "${cerebro_event_server} ${host_ip}" >> /etc/cerebro.conf
+    echo "cerebro_event_server ${host_ip}" >> /etc/cerebro.conf
 done
 
 print_message "MULTEXU_INFO" "finished to configure /etc/cerebro.conf..."

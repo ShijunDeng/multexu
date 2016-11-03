@@ -20,7 +20,9 @@ function __init()
 	export MULTEXU_BATCH_BUILD_DIR="${MULTEXU_BATCH_DIR}/build"
 	export MULTEXU_BATCH_CONFIG_DIR="${MULTEXU_BATCH_DIR}/config"
 	export MULTEXU_BATCH_CRTL_DIR="${MULTEXU_BATCH_DIR}/ctrl"
+	export MULTEXU_BATCH_DEPLOY_DIR="${MULTEXU_BATCH_DIR}/deploy"
 	export MULTEXU_BATCH_INSTALL_DIR="${MULTEXU_BATCH_DIR}/install"
+    export MULTEXU_BATCH_UNINSTALL_DIR="${MULTEXU_BATCH_DIR}/uninstall"
 	export MULTEXU_BATCH_LMT_DIR="${MULTEXU_BATCH_DIR}/lmt"
 	export MULTEXU_BATCH_TEST_DIR="${MULTEXU_BATCH_DIR}/test"
 	
@@ -30,7 +32,6 @@ function __init()
 	export MULTEXU_STATUS_EXECUTE="EXECUTE" #执行过程
 	
 	export EXECUTE_STATUS_SIGNAL="${MULTEXU_BATCH_CONFIG_DIR}/multexu.tmp" #执行过程中的信号处理
-	export MULTEXU_BATCH_DEPLOY_DIR="${MULTEXU_BATCH_DIR}/deploy"
 }
 
 ##################
