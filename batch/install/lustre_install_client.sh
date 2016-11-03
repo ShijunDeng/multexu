@@ -32,7 +32,6 @@ wait
 #yum clean all &&yum update glibc glibc-headers glibc-devel nscd && yum update
 wait
 
-
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )..."
 print_message "MULTEXU_INFO" "all jobs finished"

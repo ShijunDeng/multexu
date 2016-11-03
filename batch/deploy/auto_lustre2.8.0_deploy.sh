@@ -167,6 +167,6 @@ ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}"  $((slee
 print_message "MULTEXU_INFO" "finished configuring client nodes ..."
 #清除信号量  避免干扰
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
-
+send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 print_message "MULTEXU_INFO" "the lustre filesystem has been established..."
 exit 0

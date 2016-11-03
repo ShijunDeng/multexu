@@ -84,11 +84,11 @@ sleep ${sleeptime}s
 #这里需要注意的是：不包括编译内核的过程
 #编译lustre server
 #清除信号量 避免干扰
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${copile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_BUILD_DIR}/build_lustre_server.sh --skip_install_dependency=1"
 #等待server编译完成
-ssh_check_singlenode_status ${copile_node_ip} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
-print_message "MULTEXU_INFO" "the node ${copile_node_ip} finished to compile lustre-server..."
+ssh_check_singlenode_status ${compile_node_ip} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+print_message "MULTEXU_INFO" "the node ${compile_node_ip} finished to compile lustre-server..."
 
 
 #复制编译生成的lustre server rpm包到指定目录
@@ -97,44 +97,70 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="yes 
 `${PAUSE_CMD}`
 
 #编译lustre client
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${copile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_BUILD_DIR}/build_lustre_client.sh --skip_install_dependency=1"
 #等待server编译完成
-ssh_check_singlenode_status ${copile_node_ip} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
-print_message "MULTEXU_INFO" "the node ${copile_node_ip} finished to compile lustre-client..."
+ssh_check_singlenode_status ${compile_node_ip} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+print_message "MULTEXU_INFO" "the node ${compile_node_ip} finished to compile lustre-client..."
 
 
-#复制编译生成的lustre client rpm包到当前节点指定目录
+#复制编译生成的lustre client rpm包到编译节点指定目录
+print_message "MULTEXU_INFO" "Collecting files..."
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="yes | cp /root/kernel/rpmbuild/BUILD/lustre-2.8.0/*.rpm ${MULTEXU_SOURCE_DIR}/install/ "
+print_message "MULTEXU_INFO" "Finished to collect files..."
 `${PAUSE_CMD}`
 `${PAUSE_CMD}`
 
 #从编译节点compile_node_ip复制编译好的lustre rpm包回到当前节点 也即控制节点
-scp root@${current_node_ip}:${MULTEXU_SOURCE_DIR}/install/* ${MULTEXU_SOURCE_DIR}/install/
+scp root@${compile_node_ip}:${MULTEXU_SOURCE_DIR}/install/* ${MULTEXU_SOURCE_DIR}/install/
 sleep ${sleeptime}s
 
 #分发文件到各个节点
-sh ${MULTEXU_BATCH_CRTL_DIR}/ctrl/multexu.sh --iptable=nodes_all.out --sendfile=${base_dir} --location="$( cd "${base_dir}" && cd ../ && pwd )"
+print_message "MULTEXU_INFO" "Distributing files to all nodes..."
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --sendfile=${base_dir} --location="$( cd "${base_dir}" && cd ../ && pwd )"
 sleep 180s
+print_message "MULTEXU_INFO" "Finished to distribute files..."
 
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
 #安装lustre文件系统  不安装新内核
 sh ${MULTEXU_BATCH_INSTALL_DIR}/auto_lustre2.8.0_install.sh --skip_install_kernel=1
 #等待安装完成
-ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+while [[ $(cat ${EXECUTE_STATUS_SIGNAL}) != "${MULTEXU_STATUS_EXECUTE}" ]];
+	do
+		print_message "MULTEXU_INFO" "the current node is executing auto_lustre2.8.0_install.sh..."
+		sleep ${sleeptime}s
+done
+print_message "MULTEXU_INFO" "the current node finished to execute auto_lustre2.8.0_install.sh..."
 
+sleeptime=180
+ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+sleeptime=60
 
 #设置printk级别 清除无用日志信息 方便输出调试信息
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd='echo 8 > /proc/sys/kernel/printk'
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd='dmesg --clear'
 
 #部署文件系统
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
 sh ${MULTEXU_BATCH_DEPLOY_DIR}/auto_lustre2.8.0_deploy.sh --mdsnode=${mdsnode} --devname=${devname} --devindex=${devindex}
 #等待部署完成
-ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+while [[ $(cat ${EXECUTE_STATUS_SIGNAL}) != "${MULTEXU_STATUS_EXECUTE}" ]];
+	do
+		print_message "MULTEXU_INFO" "the current node is executing auto_lustre2.8.0_deploy.sh..."
+		sleep ${sleeptime}s
+done
+print_message "MULTEXU_INFO" "the current node finished to execute auto_lustre2.8.0_deploy.sh..."
+
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
 #安装lmt
-sh ${MULTEXU_BATCH_LMT_DIR}/lmt_install.sh --mdsnode=${mdsnode} --lmt_mgnode=${current_node_ip}
-sleep 600s
+sh ${MULTEXU_BATCH_LMT_DIR}/lmt_install.sh --mdsnode=${mdsnode}
+while [[ $(cat ${EXECUTE_STATUS_SIGNAL}) != "${MULTEXU_STATUS_EXECUTE}" ]];
+	do
+		print_message "MULTEXU_INFO" "the current node is executing lmt_install.sh..."
+		sleep ${sleeptime}s
+done
+print_message "MULTEXU_INFO" "the current node is finished to execute lmt_install.sh..."
+
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
 print_message "MULTEXU_INFO" "Process compile-->install-->deploy lustre 2.8.0 finished..."
 

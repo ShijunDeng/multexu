@@ -105,4 +105,6 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${M
 ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
 
 print_message "MULTEXU_INFO" "finish installing process..."
+`${PAUSE_CMD}`
+send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"

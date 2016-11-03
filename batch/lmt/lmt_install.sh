@@ -172,6 +172,7 @@ print_message "MULTEXU_INFO" "use the following commands to test,please..."
 print_message "MULTEXU_INFO" "oss node: /usr/sbin/lmtmetric -m ost"
 print_message "MULTEXU_INFO" "mds node: /usr/sbin/lmtmetric -m mdt"
 print_message "MULTEXU_INFO" "lmt management node: ltop"
+send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 `${PAUSE_CMD}`
 
 
