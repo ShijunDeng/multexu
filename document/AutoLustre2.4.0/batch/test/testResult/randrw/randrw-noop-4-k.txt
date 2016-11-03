@@ -1,0 +1,1 @@
+/usr/src/ascar/source/fio/fio -directory=/mnt/lustre/test -direct=0 -iodepth 5 -thread -rw=randrw -rwmixread=70 -allow_mounted_write=1 -ioengine=psync -bs=4k -size=128M -numjobs=4 -runtime=90 -group_reporting -name=ascar_test 
