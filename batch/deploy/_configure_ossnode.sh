@@ -16,7 +16,9 @@ else
         source ../ctrl/__init.sh
 fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
-
+#
+#信号量交给__configure_ossnode.sh完成
+#
 #ost 的index
 index=0
 

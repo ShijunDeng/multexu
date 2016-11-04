@@ -42,7 +42,7 @@ function clear_execute_statu_signal()
 }
 
 #
-#获得当前的状态变量
+#获得$1指定节点的状态变量
 #
 function ssh_get_execute_statu_signal()
 {
@@ -50,6 +50,33 @@ function ssh_get_execute_statu_signal()
     local ip=$1
         rs=`ssh -f ${ip} "cat ${EXECUTE_STATUS_SIGNAL}"`
     eval "$2=$rs"
+}
+
+#
+#检测本地节点的状态：$(cat ${EXECUTE_STATUS_SIGNAL}) 
+#参数顺序:status sleeptime limit
+#
+function local_check_status()
+{
+        local loop=1
+        local status=$1
+        local sleeptime=$2
+        local limit=$3
+        while [[ loop -ne 0 ]]
+        do
+            loop=0;
+            print_message "MULTEXU_INFO" "the state of local node:[${status}],the next check time will be ${sleeptime}s later..."
+            sleep ${sleeptime}s
+            local retval=$(cat ${EXECUTE_STATUS_SIGNAL}) 
+            if [[ "${retval}" != "${status}" ]]
+            then
+                    loop=1
+            fi
+            if [[ sleeptime -gt limit ]]
+            then
+                let sleeptime/=2
+            fi
+        done
 }
 
 #
@@ -72,7 +99,7 @@ function ssh_check_singlenode_status()
             ssh_get_execute_statu_signal "${host_ip}" retval
             #retval=$?
             if [[ "${retval}" != "${status}" ]]
-                then
+            then
                     loop=1
             fi
             if [[ sleeptime -gt limit ]]
@@ -116,6 +143,88 @@ function ssh_check_cluster_status()
             fi
         done
 }
+
+#
+#使用ping命令检测$1指定的节点生存状态,位置参数2返回结果
+#return：0 dead
+#        1 alive
+#
+function ping_get_node_livestat()
+{
+    if ping -c 1 -w 5 $1 &> /dev/null
+    then
+        eval "$2=1"
+    else
+        eval "$2=0"
+    fi
+    
+}
+#
+#ping检测单个节点的状态,直到节点启动
+#参数顺序:hostip status sleeptime limit
+#
+function ping_check_singlenode_livestat()
+{
+        local loop=1
+        local host_ip=$1
+        local status=$2
+        local sleeptime=$3
+        local limit=$4
+        while [[ loop -ne 0 ]]
+        do
+            loop=0;
+            print_message "MULTEXU_INFO" "the state of node ${host_ip}:[${status}],the next check time will be ${sleeptime}s later..."
+            sleep ${sleeptime}s
+            local retval=
+            ping_get_node_livestat "${host_ip}" retval
+            #retval=$?
+            if [[ retval -ne 1 ]]
+            then
+                    loop=1
+            fi
+            if [[ sleeptime -gt limit ]]
+            then
+                let sleeptime/=2
+            fi
+        done
+}
+
+#
+#ping检测集群节点的状态,直到节点启动
+#参数顺序:iptable status sleeptime limit
+#
+function ping_check_cluster_livestat()
+{
+        local loop=1
+        local iptable=$1
+        local status=$2
+        local sleeptime=$3
+        local limit=$4
+
+        while [[ loop -ne 0 ]]
+        do
+            loop=0;
+            print_message "MULTEXU_INFO" "the state of nodes which its ip in ${iptable}:[${status}],the next check time will be ${sleeptime}s later..."
+            sleep ${sleeptime}s
+            for host_ip in $(cat  "${MULTEXU_BATCH_CONFIG_DIR}/${iptable}")
+            do
+                local retval=
+                ping_get_node_livestat "${host_ip}" retval
+                #retval=$?
+                if [[ retval -ne 1 ]]
+                then
+                    loop=1
+                    break
+                fi
+            done
+            if [[ sleeptime -gt limit ]]
+            then
+                let sleeptime/=2;
+            fi
+        done
+}
+
+
 
 #
 #输出程序的提示信息

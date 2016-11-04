@@ -44,6 +44,8 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
+clear_execute_statu_signal
+
 #
 #if you login in the system as root, after this command,then you will enter /root directory
 #
@@ -52,9 +54,7 @@ cd $HOME
 BUILD_BASE_DIR="$HOME""/kernel/rpmbuild"
 
 mkdir -p "${BUILD_BASE_DIR}"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-
 cd kernel
-clear_execute_statu_signal
 print_message "MULTEXU_INFO" "install dependencies..."  
 
 #

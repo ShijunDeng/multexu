@@ -16,12 +16,11 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
-                                                         
+clear_execute_statu_signal
+                                                
 print_message "MULTEXU_INFO" "install dependencies..."                                       
 cd "${MULTEXU_SOURCE_DIR}"/install
 print_message "MULTEXU_INFO" "enter directory ${MULTEXU_SOURCE_DIR}/install..."
-
-clear_execute_statu_signal
 
 rpm -ivh lustre-modules* --nodeps --force
 wait

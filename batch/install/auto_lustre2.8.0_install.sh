@@ -22,6 +22,8 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
+clear_execute_statu_signal 
+
 #是否需要安装内核
 skip_install_kernel=0
 while :;

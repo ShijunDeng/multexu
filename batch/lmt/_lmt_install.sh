@@ -22,6 +22,7 @@ else
 	`${PAUSE_CMD}`
 fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
+clear_execute_statu_signal
 
 cd "${MULTEXU_SOURCE_DIR}"/lmt
 print_message "MULTEXU_INFO" "enter directory ${MULTEXU_SOURCE_DIR}/lmt..."
@@ -42,7 +43,6 @@ fi
 `${PAUSE_CMD}`
 
 #设置完成标识
-clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 print_message "MULTEXU_INFO" "leave directory $( dirname "${BASH_SOURCE[0]}" )..."
 

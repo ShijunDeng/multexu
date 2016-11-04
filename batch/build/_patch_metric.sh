@@ -7,6 +7,10 @@
 #       time:    2016-10-12
 #
 
+#
+#这里暂时不要使用信号量 因为会与管理节点的信号量冲突
+#
+
 #lustre/
 cp -rf ${MULTEXU_SOURCE_DIR}/build/metric/metric-tests lustre/
 #lustre/osc/

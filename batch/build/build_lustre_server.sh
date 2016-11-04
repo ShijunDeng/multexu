@@ -22,12 +22,13 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
+clear_execute_statu_signal
+
 #
 #if you login in the system as root, after this command,then you will enter /root directory
 #
 cd $HOME
 
-clear_execute_statu_signal
 BUILD_BASE_DIR="$HOME""/kernel/rpmbuild"
 #grep -Ri 'intel' /usr
 #rpm -ivh $PKG_PATH/kernel-*.rpm

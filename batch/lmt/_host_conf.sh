@@ -17,7 +17,7 @@ else
 	`${PAUSE_CMD}`
 fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
-
+clear_execute_statu_signal
 #hostfile="/etc/hostfile"
 
 #配置/etc/hosts
@@ -38,6 +38,5 @@ yes | cp ${MULTEXU_BATCH_CONFIG_DIR}/hosts /etc/
 #done
 yes | cp ${MULTEXU_BATCH_CONFIG_DIR}/hostsfile /etc/
 #设置完成标识
-clear_execute_statu_signal
 send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 `${PAUSE_CMD}`

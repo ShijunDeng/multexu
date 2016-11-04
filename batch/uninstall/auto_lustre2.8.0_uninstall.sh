@@ -22,6 +22,8 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
+clear_execute_statu_signal 
+
 #是否需要卸载内核
 skip_uninstall_kernel=0
 while :;
@@ -76,5 +78,5 @@ if [ ${skip_uninstall_kernel} -eq 1 ];then
 fi  
 print_message "MULTEXU_INFO" "finish uninstalling process..."
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
-
+send_execute_statu_signal "${MULTEXU_STATUS_EXECUTE}"
 

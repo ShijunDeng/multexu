@@ -21,6 +21,7 @@ else
 	`${PAUSE_CMD}`
 fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
+clear_execute_statu_signal 
 
 #mds 的ip
 mdsnode=
@@ -105,29 +106,17 @@ if [ ! -n "${lmt_mgnode}" ]; then
 	print_message "MULTEXU_INFO" "the current node is going to install mysql..."
 	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
 	sh ${MULTEXU_BATCH_LMT_DIR}/_mysql_install.sh
-	while [[ $(cat ${EXECUTE_STATUS_SIGNAL}) != "${MULTEXU_STATUS_EXECUTE}" ]];
-	do
-		print_message "MULTEXU_INFO" "the current node is installing mysql..."
-		sleep ${sleeptime}s
-	done
+	local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
     
 	print_message "MULTEXU_INFO" "the current node is going to install cerebro..."
 	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
 	sh ${MULTEXU_BATCH_LMT_DIR}/_cerebro_install.sh
-	while [[ $(cat ${EXECUTE_STATUS_SIGNAL}) != "${MULTEXU_STATUS_EXECUTE}" ]];
-	do
-		print_message "MULTEXU_INFO" "the current node is installing cerebro..."
-		sleep ${sleeptime}s
-	done
+	local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
 
 	print_message "MULTEXU_INFO" "the current node is going to install lmt-server..."
 	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
 	sh ${MULTEXU_BATCH_LMT_DIR}/_lmt_install.sh --server
-	while [[ $(cat ${EXECUTE_STATUS_SIGNAL}) != "${MULTEXU_STATUS_EXECUTE}" ]];
-	do
-		print_message "MULTEXU_INFO" "the current node is installing lmt-server..."
-		sleep ${sleeptime}s
-	done
+	local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
 	
 	sh ${MULTEXU_BATCH_LMT_DIR}/_configure_cerebro_conf.sh -s ${mdsnode}
     

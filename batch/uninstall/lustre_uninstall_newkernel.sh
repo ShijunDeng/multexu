@@ -15,6 +15,7 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"                                                                     
+clear_execute_statu_signal
 
 print_message "MULTEXU_INFO" "now start uninstall lustre new kernel..."
 yum remove kernel-3.10.0_3.10.0_327.3.1.el7_lustre.x86_64-1.x86_64

@@ -11,6 +11,10 @@
 sleeptime=60 #设置检测的睡眠时间
 limit=10 #递减下限
 
+#计算程序运行的时间
+start_time=$(date +%s%N)
+start_time_ms=${start_time:0:16}
+
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
 if [ ! -f __init.sh ]; then
 	echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
@@ -24,9 +28,19 @@ fi
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
 
 print_message "MULTEXU_INFO" "Now start to compile-->install-->deploy lustre 2.8.0 ..."
-
 #基准目录
 base_dir=${MULTEXU_BASE_DIR}
+#kvm节点备份目录
+kvm_source_bakpath=/home/ca21/DevelopmentFiles
+#kvm资源文件目录
+kvm_source_path=/home/ca21/Downloads
+#lustre文件系统节点机器的名称
+kvm_nodes_name_lustre=("centos7.0-c1" "centos7.0-c2" "centos7.0-c3" "centos7.0-c4" "centos7.0-c5" "centos7.0-c6" "centos7.0-c7")
+#lustre文件系统节点机器的资源名称
+kvm_source_name_lustre=("centos7-c1.qcow2" "centos7-c2.qcow2" "centos7-c3.qcow2" "centos7-c4.qcow2" "centos7-c5.qcow2" "centos7-c6.qcow2" "centos7-c7.qcow2")
+#进行编译工作机器节点的名称
+kvm_node_name_dev="centosdev"
+kvm_source_name_dev="centosdev.qcow2"
 #编译节点
 compile_node_ip=192.168.122.101
 #当前节点ip
@@ -36,37 +50,73 @@ mdsnode=192.168.122.15
 devname=/dev/vda 
 devindex=7
 
+#是否需要编译内核
+skip_build_kernel=1
+while :;
+do
+    case $1 in
+        --skip_build_kernel=?*)
+            skip_build_kernel=${1#*=}
+            shift
+            ;;
+		-?*)
+            printf 'WARN: Unknown option (ignored): %s\n' "(" >&2")"
+            shift
+            ;;
+		*)	# Default case: If no more options then break out of the loop.
+			shift
+			break
+	esac		
+done
+#
+#centos7.0-c1-centos7.0-c7是lustre文件系统测试节点,其中lustre适配的新内核已经安装完毕,如需要安装新内核,修改相关参数
+#centosdev是编译lustre的节点,不是lustre文件系统的成员节点,相关的内核也安装完毕
+#
 print_message "MULTEXU_INFO" "Now start to prepare compiling files..."
-virsh shutdown centos7.0-c1
-virsh shutdown centos7.0-c2
-virsh shutdown centos7.0-c3
-virsh shutdown centos7.0-c4
-virsh shutdown centos7.0-c5
-virsh shutdown centos7.0-c6
-virsh shutdown centos7.0-c7
+#
+#关闭旧机器 用新的备份节点替换文件 进行全新的安装
+#
+
+if [ ${skip_build_kernel} -eq 0 ];then 
+    virsh shutdown ${kvm_node_name_dev}
+fi
+for node_lustre in ${kvm_nodes_name_lustre[@]}
+do
+    virsh shutdown ${node_lustre}
+done
 sleep ${sleeptime}s
-echo yes | cp /home/ca21/DevelopmentFiles/centos7-c1.qcow2 /home/ca21/Downloads/
-wait
-echo yes | cp /home/ca21/DevelopmentFiles/centos7-c2.qcow2 /home/ca21/Downloads/
-wait
-echo yes | cp /home/ca21/DevelopmentFiles/centos7-c3.qcow2 /home/ca21/Downloads/
-wait
-echo yes | cp /home/ca21/DevelopmentFiles/centos7-c4.qcow2 /home/ca21/Downloads/
-wait
-echo yes | cp /home/ca21/DevelopmentFiles/centos7-c5.qcow2 /home/ca21/Downloads/
-wait
-echo yes | cp /home/ca21/DevelopmentFiles/centos7-c6.qcow2 /home/ca21/Downloads/
-wait
-echo yes | cp /home/ca21/DevelopmentFiles/centos7-c7.qcow2 /home/ca21/Downloads/
-wait
-virsh start  centos7.0-c1
-virsh start  centos7.0-c2
-virsh start  centos7.0-c3
-virsh start  centos7.0-c4
-virsh start  centos7.0-c5
-virsh start  centos7.0-c6
-virsh start  centos7.0-c7
-sleep 120s
+
+print_message "MULTEXU_INFO" "Preparing new nodes..."
+#
+#复制备份节点  先关路径根据实际情况配置
+#
+for kvm_source in ${kvm_source_name_lustre[@]}
+do
+    echo yes | cp ${kvm_source_bakpath}/${kvm_source} ${kvm_source_path}/${kvm_source}
+    print_message "MULTEXU_INFO" "cp ${kvm_source_bakpath}/${kvm_source} ${kvm_source_path}/${kvm_source}..."
+    wait
+done
+if [ ${skip_build_kernel} -eq 0 ];then 
+    echo yes | cp ${kvm_source_bakpath}/${kvm_source_name_dev} ${kvm_source_path}/${kvm_source_name_dev}
+    wait
+fi
+
+virsh start ${kvm_node_name_dev}
+for node_lustre in ${kvm_nodes_name_lustre[@]}
+do
+    virsh start ${node_lustre}
+done
+
+#检测节点是否已经完成启动
+ping_check_singlenode_livestat ${compile_node_ip} "dead"  "${sleeptime}" "${limit}"
+ping_check_cluster_livestat "nodes_all.out" "dead" "${sleeptime}" "${limit}"
+print_message "MULTEXU_INFO" "New nodes are ready..."
+
+`${PAUSE_CMD}`
+`${PAUSE_CMD}`
+
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_available=nodes_all.out
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_ssh_enabled=nodes_all.out
 
 #删除旧文件
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="rm -rf ${base_dir}/Fdm-LustreQoS"
@@ -79,11 +129,69 @@ rm -f ${MULTEXU_SOURCE_DIR}/install/lustre-*
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --sendfile=${base_dir} --location="$( cd "${base_dir}" && cd ../ && pwd )"
 sleep ${sleeptime}s
 
+#编译&&安装内核
+if [ ${skip_build_kernel} -eq 0 ];then     
+    print_message "MULTEXU_INFO" "the nodes ${kvm_node_name_dev}:${current_node_ip} is going to build&&install new kernel..."   
+    #
+    #在编译节点上进行编译过程
+    #编译lustre new kernel
+    #清除信号量 避免干扰
+    #
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_BUILD_DIR}/build_newkernel.sh"
+    #kernel
+    sleeptime=900
+    ssh_check_singlenode_status ${compile_node_ip} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+    sleeptime=60
+    
+    #处理安装之前的预操作 关闭SELinux 关闭防火墙等
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_INSTALL_DIR}/lustre_install_pre.sh"
+    #检测上述操作是否完成
+    ssh_check_singlenode_status ${compile_node_ip} "${MULTEXU_STATUS_EXECUTE}" $((sleeptime/4)) ${limit}
+
+    #清除信号量  避免干扰
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+    `${PAUSE_CMD}`
+    #置入重启之前信号量
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --send_execute_statu_signal=${MULTEXU_STATUS_REBOOT}"
+    #命令结点重启
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --reboot
+    print_message "MULTEXU_INFO" "the node ${kvm_node_name_dev}:${current_node_ip} is going to reboot..."
+    #睡眠 暂停一段时间
+    `${PAUSE_CMD}`
+    #循环检测是否重启完成
+    ssh_check_singlenode_status ${compile_node_ip} "${MULTEXU_STATUS_REBOOT}" ${sleeptime} ${limit}
+    print_message "MULTEXU_INFO" "the node ${kvm_node_name_dev}:${current_node_ip} finished to reboot..."
+    
+    #检测和节点的状态：是否可达  ssh端口22是否启用
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_available=${compile_node_ip}
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --test_host_ssh_enabled=${compile_node_ip}
+    
+    #清除信号量  避免干扰
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+    #安装lustre新内核
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_INSTALL_DIR}/lustre_install_newkernel.sh"
+    ssh_check_singlenode_status ${compile_node_ip} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+    #清除信号量  避免干扰
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+    #置入重启之前信号量
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --send_execute_statu_signal=${MULTEXU_STATUS_REBOOT}"
+    #命令结点重启
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --reboot
+    print_message "MULTEXU_INFO" "the node ${kvm_node_name_dev}:${current_node_ip} is going to reboot..."
+    #睡眠 暂停一段时间
+    `${PAUSE_CMD}`
+    `${PAUSE_CMD}`
+    #循环检测是否重启完成
+    ssh_check_singlenode_status ${compile_node_ip} "${MULTEXU_STATUS_REBOOT}" ${sleeptime} ${limit}
+    print_message "MULTEXU_INFO" "the node ${kvm_node_name_dev}:${current_node_ip} finished to reboot..."
+fi
+
 #
 #在编译节点上进行编译过程
-#这里需要注意的是：不包括编译内核的过程
 #编译lustre server
 #清除信号量 避免干扰
+#
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${compile_node_ip} --cmd="sh ${MULTEXU_BATCH_BUILD_DIR}/build_lustre_server.sh --skip_install_dependency=1"
 #等待server编译完成
@@ -122,19 +230,11 @@ sleep 180s
 print_message "MULTEXU_INFO" "Finished to distribute files..."
 
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
-#安装lustre文件系统  不安装新内核
-sh ${MULTEXU_BATCH_INSTALL_DIR}/auto_lustre2.8.0_install.sh --skip_install_kernel=1
+#安装lustre文件系统  注意确定是否安装新内核
+sh ${MULTEXU_BATCH_INSTALL_DIR}/auto_lustre2.8.0_install.sh --skip_install_kernel=${skip_build_kernel}
 #等待安装完成
-while [[ $(cat ${EXECUTE_STATUS_SIGNAL}) != "${MULTEXU_STATUS_EXECUTE}" ]];
-	do
-		print_message "MULTEXU_INFO" "the current node is executing auto_lustre2.8.0_install.sh..."
-		sleep ${sleeptime}s
-done
+local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
 print_message "MULTEXU_INFO" "the current node finished to execute auto_lustre2.8.0_install.sh..."
-
-sleeptime=180
-ssh_check_cluster_status "nodes_all.out" "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
-sleeptime=60
 
 #设置printk级别 清除无用日志信息 方便输出调试信息
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_all.out --cmd='echo 8 > /proc/sys/kernel/printk'
@@ -154,13 +254,15 @@ print_message "MULTEXU_INFO" "the current node finished to execute auto_lustre2.
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
 #安装lmt
 sh ${MULTEXU_BATCH_LMT_DIR}/lmt_install.sh --mdsnode=${mdsnode}
-while [[ $(cat ${EXECUTE_STATUS_SIGNAL}) != "${MULTEXU_STATUS_EXECUTE}" ]];
-	do
-		print_message "MULTEXU_INFO" "the current node is executing lmt_install.sh..."
-		sleep ${sleeptime}s
-done
+local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
 print_message "MULTEXU_INFO" "the current node is finished to execute lmt_install.sh..."
 
 sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
+#计算程序运行的时间
+end_time=$(date +%s%N)
+end_time_ms=${end_time:0:16}
+#scale=6
+time_cost=0
+time_cost=`echo "scale=6;($end_time_ms - $start_time_ms)/1000000"` 
 print_message "MULTEXU_INFO" "Process compile-->install-->deploy lustre 2.8.0 finished..."
-
+print_message "MULTEXU_INFO" "Total time spent:${time_cost} s"

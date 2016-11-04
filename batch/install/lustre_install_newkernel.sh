@@ -15,10 +15,10 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"                                                                     
+clear_execute_statu_signal
 
 print_message "MULTEXU_INFO" "install dependencies..."                                       
 print_message "MULTEXU_INFO" "enter directory $( dirname "${BASH_SOURCE[0]}" )..."
-clear_execute_statu_signal
 `${PAUSE_CMD}`
 
 yum -y groupinstall "Development Tools"

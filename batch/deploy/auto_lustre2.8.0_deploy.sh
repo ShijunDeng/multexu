@@ -16,6 +16,8 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
+clear_execute_statu_signal 
+
 sleeptime=60 #设置检测的睡眠时间
 limit=10 #递减下限
 #文件系统所在的设备名称
@@ -25,7 +27,6 @@ devindex=
 #mds 的ip
 mdsnode=
 #
-
 #获取参数值
 function get_parameters()
 {
