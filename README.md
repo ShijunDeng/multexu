@@ -16,12 +16,14 @@ multexu - A muxmulti-node execution tool
 We assume that one master node as controller, the tool will run in master node.
 
 (1).Configuring the file batch/config/nodes_authorize.out,note that one host ip occur on a single line.For example:
-      192.168.122.101
-      192.168.122.102
-      192.168.122.103
+      
+		192.168.122.101
+		192.168.122.102
+		192.168.122.103
 (2).Runing the file authorize/start_authorize.sh.command:
 
-      sh file authorize/start_authorize.sh
+      sh authorize/start_authorize.sh
+
   then you will see these as bellow:
   
       [root@CentOS1 authorize]# sh ClientAuthorize.sh
@@ -67,7 +69,7 @@ then wait for rebooting (nodes 192.168.122.101-192.168.122.103)
 (3)now you can use mutlexu,run:
 
       sh ctrl/multexu.sh -h  sh ctrl/multexu.sh --help
-  to get help document
+  to get help [document](https://github.com/ShijunDeng/multexu/blob/master/batch/ctrl/help_doc.txt)
 
 ##Feedback and Suggestions
 - Any questions,contact <dengshijun1992@gmail.com>.please click here and send
