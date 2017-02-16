@@ -30,45 +30,45 @@ mdsnode=
 #获取参数值
 function get_parameters()
 {
-	while :; 
-	do
-		case $1 in
-			--devname=?*)
-				devname=${1#*=}
-				shift
-				;;
-			--mdsnode=?*)
-				mdsnode=${1#*=}
-				shift
-				;;
-			--devindex=?*)
-				devindex=${1#*=}
-				shift
-				;;
-			-?*)
+    while :; 
+    do
+        case $1 in
+            --devname=?*)
+                devname=${1#*=}
+                shift
+                ;;
+            --mdsnode=?*)
+                mdsnode=${1#*=}
+                shift
+                ;;
+            --devindex=?*)
+                devindex=${1#*=}
+                shift
+                ;;
+            -?*)
                 printf 'WARN: Unknown option (ignored): %s\n' "(" >&2")"
                 shift
-				;;
-			*)	# Default case: If no more options then break out of the loop.
-				shift
-				break
-		esac
-	done
-	#处理参数缺省情况,devname和mdsnode都是不可缺省的，只有二者都给出方能正确运行，否则非正常终止程序
-	if [ ! -n "${devname}" ]; then
-		print_message "MULTEXU_ERROR" "the parameter --devname is necessary..."
-		exit 1;
-	fi
-	
-	if [ ! -n "${mdsnode}" ]; then
-		print_message "MULTEXU_ERROR" "the parameter --mdsnode is necessary..."
-		exit 1;
-	fi
-	
-	if [ ! -n "${devindex}" ]; then
-		print_message "MULTEXU_ERROR" "the parameter --devindex is necessary..."
-		exit 1;
-	fi
+                ;;
+            *)    # Default case: If no more options then break out of the loop.
+                shift
+                break
+        esac
+    done
+    #处理参数缺省情况,devname和mdsnode都是不可缺省的，只有二者都给出方能正确运行，否则非正常终止程序
+    if [ ! -n "${devname}" ]; then
+        print_message "MULTEXU_ERROR" "the parameter --devname is necessary..."
+        exit 1;
+    fi
+    
+    if [ ! -n "${mdsnode}" ]; then
+        print_message "MULTEXU_ERROR" "the parameter --mdsnode is necessary..."
+        exit 1;
+    fi
+    
+    if [ ! -n "${devindex}" ]; then
+        print_message "MULTEXU_ERROR" "the parameter --devindex is necessary..."
+        exit 1;
+    fi
 }
 ###############
 get_parameters $@
@@ -163,7 +163,7 @@ sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_oss.out --cmd="sh ${MULT
 
 #配置client node
 print_message "MULTEXU_INFO" "configure client nodes..."
-sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_clientnode.sh -s ${mdsnode} -m lustre"
+sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=nodes_client.out --cmd="sh ${MULTEXU_BATCH_DEPLOY_DIR}/__configure_clientnode.sh -s ${mdsnode} -m ${MULTEXU_CLIENT_MNT_DIR}"
 ssh_check_cluster_status "nodes_client.out" "${MULTEXU_STATUS_EXECUTE}"  $((sleeptime/2)) "${limit}"
 print_message "MULTEXU_INFO" "finished configuring client nodes ..."
 #清除信号量  避免干扰

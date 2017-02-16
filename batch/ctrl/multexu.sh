@@ -8,10 +8,10 @@
 #initialization
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
 if [ ! -f __init.sh ]; then
-	echo "MULTEXU ERROR:multexu initialization failure:cannot find the file __init.sh... "
-	exit 1
+    echo "MULTEXU ERROR:multexu initialization failure:cannot find the file __init.sh... "
+    exit 1
 else
-	source ./__init.sh
+    source ./__init.sh
 fi
 
 # Reset all variables that might be set

@@ -13,12 +13,12 @@ limit=10 #递减下限
 
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
 if [ ! -f ../ctrl/__init.sh ]; then
-	echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
-	exit 1
+    echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
+    exit 1
 else
-	source ../ctrl/__init.sh
-	echo 'MULTEXU INFO:initialization completed...'
-	`${PAUSE_CMD}`
+    source ../ctrl/__init.sh
+    echo 'MULTEXU INFO:initialization completed...'
+    `${PAUSE_CMD}`
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
@@ -33,14 +33,14 @@ do
             skip_uninstall_kernel=${1#*=}
             shift
             ;;
-		-?*)
+        -?*)
             printf 'WARN: Unknown option (ignored): %s\n' "(" >&2")"
             shift
             ;;
-		*)	# Default case: If no more options then break out of the loop.
-			shift
-			break
-	esac		
+        *)    # Default case: If no more options then break out of the loop.
+            shift
+            break
+    esac        
 done
 print_message "MULTEXU_INFO" "Now start to uninstall lustre 2.8.0 ..."
 #检测和节点的状态：是否可达  ssh端口22是否启用

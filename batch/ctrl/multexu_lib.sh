@@ -5,6 +5,7 @@
 #     author:    ShijunDeng
 #      email:    dengshijun1992@gmail.com
 #       time:    2016-07-24
+#last revise:     2017-01-13
 
 #initialization
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
@@ -20,36 +21,45 @@ fi
 
 #
 #往通信文件中写入一个信号变量
+#$1 signal content
+#$2 signal file name,默认值"${EXECUTE_STATUS_SIGNAL}"
 #
 function send_execute_statu_signal()
 {
-    local signal_content=$1
-    if [ ! -f "${EXECUTE_STATUS_SIGNAL}" ]; then
-        touch "${EXECUTE_STATUS_SIGNAL}"
+    if [ -n "$2" ];then
+        echo "$1" > "$2"
+    else
+        send_execute_statu_signal $1 "${EXECUTE_STATUS_SIGNAL}"
     fi
-    echo "${signal_content}" > "${EXECUTE_STATUS_SIGNAL}"
 }
 
 #
 #清空通信文件中的信号变量
+#$1 信号量文件,默认值"${EXECUTE_STATUS_SIGNAL}"
 #
 function clear_execute_statu_signal()
 {
-    if [ ! -f "${EXECUTE_STATUS_SIGNAL}" ]; then
-	    touch "${EXECUTE_STATUS_SIGNAL}"
-    fi
-        echo "" > "${EXECUTE_STATUS_SIGNAL}"	
+    if [ -n "$1" ];then
+        : > "$1"
+    else
+        clear_execute_statu_signal "${EXECUTE_STATUS_SIGNAL}"
+    fi    
 }
 
 #
-#获得$1指定节点的状态变量
+#获得指定节点的状态变量
+#$2指定节点的ip
+#$3信号量文件 缺省的情况默认信号量文件为$EXECUTE_STATUS_SIGNAL
 #
 function ssh_get_execute_statu_signal()
 {
-    local rs=
-    local ip=$1
-        rs=`ssh -f ${ip} "cat ${EXECUTE_STATUS_SIGNAL}"`
-    eval "$2=$rs"
+    local ip=$2
+    local signal_file=$3
+    if [ ! -f "${signal_file}" ];then
+        signal_file=${EXECUTE_STATUS_SIGNAL}
+    fi
+    local rs=`ssh -f ${ip} "cat ${signal_file}"`
+    eval "$1=$rs"
 }
 
 #
@@ -58,22 +68,22 @@ function ssh_get_execute_statu_signal()
 #
 function local_check_status()
 {
-        local loop=1
         local status=$1
         local sleeptime=$2
         local limit=$3
-        while [[ loop -ne 0 ]]
+        local signal_file=$4
+        if [ ! -f "${signal_file}" ];then
+            signal_file=${EXECUTE_STATUS_SIGNAL}
+        fi
+        while [ true ]
         do
-            loop=0;
-            print_message "MULTEXU_INFO" "the state of local node:[${status}],the next check time will be ${sleeptime}s later..."
+            print_message "MULTEXU_INFO" "waiting for local node signal:[${status}],the next check time will be ${sleeptime}s later..."
             sleep ${sleeptime}s
-            local retval=$(cat ${EXECUTE_STATUS_SIGNAL}) 
-            if [[ "${retval}" != "${status}" ]]
-            then
-                    loop=1
+            local retval=$(cat ${signal_file}) 
+            if [ "${retval}" = "${status}" ];then
+                break
             fi
-            if [[ sleeptime -gt limit ]]
-            then
+            if [ $sleeptime -gt $limit ];then
                 let sleeptime/=2
             fi
         done
@@ -81,29 +91,26 @@ function local_check_status()
 
 #
 #检测单个节点的状态
-#参数顺序:hostip status sleeptime limit
-#
+#参数顺序:hostip status sleeptime limit signal_file
+#signal_file:信号量文件,默认值"${EXECUTE_STATUS_SIGNAL}"
 function ssh_check_singlenode_status()
 {
-        local loop=1
         local host_ip=$1
         local status=$2
         local sleeptime=$3
         local limit=$4
-        while [[ loop -ne 0 ]]
+        local signal_file=$5
+        while [ true ];
         do
-            loop=0;
-            print_message "MULTEXU_INFO" "the state of node ${host_ip}:[${status}],the next check time will be ${sleeptime}s later..."
+            print_message "MULTEXU_INFO" "waiting for node ${host_ip} signal:[${status}],the next check time will be ${sleeptime}s later..."
             sleep ${sleeptime}s
             local retval=
-            ssh_get_execute_statu_signal "${host_ip}" retval
+            ssh_get_execute_statu_signal retval "${host_ip}" "${signal_file}" 
             #retval=$?
-            if [[ "${retval}" != "${status}" ]]
-            then
-                    loop=1
+            if [ "${retval}" = "${status}" ];then
+                break
             fi
-            if [[ sleeptime -gt limit ]]
-            then
+            if [ $sleeptime -gt $limit ];then
                 let sleeptime/=2
             fi
         done
@@ -115,47 +122,43 @@ function ssh_check_singlenode_status()
 #
 function ssh_check_cluster_status()
 {
-        local loop=1
         local iptable=$1
         local status=$2
         local sleeptime=$3
         local limit=$4
-
-        while [[ loop -ne 0 ]]
+        local signal_file=$5
+        
+        while [ true ];
         do
-            loop=0;
-            print_message "MULTEXU_INFO" "the state of nodes which its ip in ${iptable}:[ ${status}],the next check time will be ${sleeptime}s later..."
+            print_message "MULTEXU_INFO" "waiting for nodes which its ip in ${iptable} signal [${status}],the next check time will be ${sleeptime}s later..."
             sleep ${sleeptime}s
-            for host_ip in $(cat  "${MULTEXU_BATCH_CONFIG_DIR}/${iptable}")
+            for host_ip in $(cat "${MULTEXU_BATCH_CONFIG_DIR}/${iptable}")
             do
                 local retval=
-                ssh_get_execute_statu_signal "${host_ip}" retval
+                ssh_get_execute_statu_signal retval "${host_ip}" "${signal_file}" 
                 #retval=$?
-                if [[ "${retval}" != "${status}" ]]
-                then
-                    loop=1
-                    break
-                 fi
+                if [ "${retval}" = "${status}" ];then
+                    break 2
+                fi
             done
-            if [[ sleeptime -gt limit ]]
-            then
-                let sleeptime/=2;
+            if [ $sleeptime -gt $limit ];then
+                let sleeptime/=2
             fi
         done
 }
 
 #
-#使用ping命令检测$1指定的节点生存状态,位置参数2返回结果
-#return：0 dead
-#        1 alive
+#使用ping命令检测$1指定的节点生存状态,位置参数1返回结果
+#return：1 dead
+#        0 alive
 #
 function ping_get_node_livestat()
 {
-    if ping -c 1 -w 5 $1 &> /dev/null
-    then
-        eval "$2=1"
+    local host_ip=$1
+    if [ ping -c 1 -w 5 $host_ip &> /dev/null ];then
+        return 0
     else
-        eval "$2=0"
+        return 1
     fi
     
 }
@@ -165,25 +168,18 @@ function ping_get_node_livestat()
 #
 function ping_check_singlenode_livestat()
 {
-        local loop=1
         local host_ip=$1
         local status=$2
         local sleeptime=$3
         local limit=$4
-        while [[ loop -ne 0 ]]
+        while [ loop -ne 0 ]
         do
-            loop=0;
-            print_message "MULTEXU_INFO" "the state of node ${host_ip}:[${status}],the next check time will be ${sleeptime}s later..."
+            print_message "MULTEXU_INFO" "ping check node ${iptable} live state,waiting for the signal [${status}],the next check time will be ${sleeptime}s later..."
             sleep ${sleeptime}s
-            local retval=
-            ping_get_node_livestat "${host_ip}" retval
-            #retval=$?
-            if [[ retval -ne 1 ]]
-            then
-                    loop=1
+            if ping_get_node_livestat ${host_ip} ;then
+                break
             fi
-            if [[ sleeptime -gt limit ]]
-            then
+            if [ $sleeptime -gt $limit ];then
                 let sleeptime/=2
             fi
         done
@@ -195,36 +191,52 @@ function ping_check_singlenode_livestat()
 #
 function ping_check_cluster_livestat()
 {
-        local loop=1
         local iptable=$1
         local status=$2
         local sleeptime=$3
         local limit=$4
-
-        while [[ loop -ne 0 ]]
+        while [ true ];
         do
-            loop=0;
-            print_message "MULTEXU_INFO" "the state of nodes which its ip in ${iptable}:[${status}],the next check time will be ${sleeptime}s later..."
+            print_message "MULTEXU_INFO" "ping check cluster ${iptable} live state,waiting for the signal [${status}],the next check time will be ${sleeptime}s later..."
             sleep ${sleeptime}s
-            for host_ip in $(cat  "${MULTEXU_BATCH_CONFIG_DIR}/${iptable}")
+            for host_ip in $(cat "${MULTEXU_BATCH_CONFIG_DIR}/${iptable}")
             do
-                local retval=
-                ping_get_node_livestat "${host_ip}" retval
-                #retval=$?
-                if [[ retval -ne 1 ]]
-                then
-                    loop=1
-                    break
+                if ping_get_node_livestat ${host_ip} ;then
+                    break 2
                 fi
             done
-            if [[ sleeptime -gt limit ]]
-            then
-                let sleeptime/=2;
+            if [ $sleeptime -gt $limit ];then
+                let sleeptime/=2
             fi
         done
 }
 
-
+#
+#根据$2选项参数,自动创建$1参数指定的目录(一律使用mkdir -p):
+#关于$2选项说明:
+#    --force 创建$1目录之前先检测$1是否存在:若存在,先删除旧目录后创建;否则直接创建新目录$1
+#    --weak  创建$1目录之前先检测$1是否存在:若存在不执行创建操作;否则创建新目录$1
+#    $2若未明确给出,默认为weak
+#
+function auto_mkdir()
+{
+    #$1 dirname $2 option
+    if [ $# -lt 1 ];then
+        return
+    fi
+    if [ $# -eq 1 -o "$2"x == "weak"x ];then
+        if [ ! -d $1 ];then
+            mkdir -p $1
+            return
+        fi
+    fi
+    if [ $# -eq 2 -a "$2"x == "force"x ];then
+        if [ -d $1 ];then
+            rm -rf $1
+        fi
+        auto_mkdir $1 "weak"
+    fi    
+}
 
 #
 #输出程序的提示信息
@@ -233,6 +245,7 @@ function ping_check_cluster_livestat()
 #MULTEXU_ERROR 错误
 #MULTEXU_WARN 警告信息
 #MULTEXU_ECHO 输出不带标志,直接封装echo,和echo效果一样
+#MULTEXU_ECHOX 在输入以前先执行一条命令(主要是重定向之类的命令)
 #
 function print_message()
 {
@@ -244,7 +257,12 @@ function print_message()
             ;;
         MULTEXU_ECHO)
             echo "$@"
-           ;;		
+           ;;
+        MULTEXU_ECHOX)
+            local cmd=$1
+            shift
+            if [ "x${cmd}" = "x1>&2" -o "x${cmd}" = "x1&>2" -o "x${cmd}" = "x&>2" -o "x${cmd}" = "x>&2" ];then
+                1>&2 echo "$@"
+            fi            
     esac
 }
-

@@ -16,17 +16,16 @@ else
 fi
 
 source "${MULTEXU_BATCH_CRTL_DIR}/multexu_lib.sh"
-`${PAUSE_CMD}`
 #清除信号量  避免干扰
 clear_execute_statu_signal
 
 #
 #如果fio目录存在,表示fio已经解压安装过;否则进行解压安装;
 #
-if [ ! -d ${MULTEXU_SOURCE_DIR}/tool/fio ] ;
+if [ ! -d ${MULTEXU_SOURCE_TOOL_DIR}/fio ] ;
 then
     print_message "MULTEXU_INFO" "now start to install fio..."
-    cd ${MULTEXU_SOURCE_DIR}/tool/
+    cd ${MULTEXU_SOURCE_TOOL_DIR}/
 
     yum -y install gtk2-devel 
     yum -y install glib2-devel
@@ -36,7 +35,7 @@ then
     ./configure --enable-gfio
     make fio
     make gfio
-	wait
+    wait
 fi
 
 #置入执行信号量 代表fio安装完成

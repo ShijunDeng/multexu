@@ -25,12 +25,12 @@ devindex= #分区索引号
 start= 
 
 while getopts 'd:i:' opt;do
-	case $opt in
-		d)
-			devname=$OPTARG;;
-		i)
-			devindex=$OPTARG;;
-	esac
+    case $opt in
+        d)
+            devname=$OPTARG;;
+        i)
+            devindex=$OPTARG;;
+    esac
 done
 if [ ! -n ${devname} ] || [ ! -n ${devindex} ]; then
     print_message "MULTEXU_ERROR" "-d|-i is necessary..."

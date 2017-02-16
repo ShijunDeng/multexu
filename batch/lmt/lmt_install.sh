@@ -13,12 +13,12 @@ limit=10 #递减下限
 
 cd "$( dirname "${BASH_SOURCE[0]}" )" #get  a Bash script tell what directory it's stored in
 if [ ! -f ../ctrl/__init.sh ]; then
-	echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
-	exit 1
+    echo "MULTEXU Error:initialization failure:cannot find the file __init.sh... "
+    exit 1
 else
-	source ../ctrl/__init.sh
-	echo 'MULTEXU INFO:initialization completed...'
-	`${PAUSE_CMD}`
+    source ../ctrl/__init.sh
+    echo 'MULTEXU INFO:initialization completed...'
+    `${PAUSE_CMD}`
 fi
 source "${MULTEXU_BATCH_CRTL_DIR}"/multexu_lib.sh #调入multexu库
 clear_execute_statu_signal 
@@ -30,31 +30,31 @@ lmt_mgnode=
 #获取参数值
 function main()
 {
-	while :; 
-	do
-		case $1 in
-			--mdsnode=?*)
-				mdsnode=${1#*=}
-				shift
-				;;
-			--lmt_mgnode=?*)
-				lmt_mgnode=${1#*=}
-				shift
-				;;
-			-?*)
-				printf 'MULTEXU WARN: Unknown option (ignored): %s\n' "$1" >&2
-				shift
-				;;
-			*)	# Default case: If no more options then break out of the loop.
-				shift
-				break
-		esac
-	done
-	#处理参数缺省情况,mdsnode是不可缺省的，只有给出方能正确运行，否则非正常终止程序	
-	if [ ! -n "${mdsnode}" ]; then
-		print_message "MULTEXU_ERROR" "the parameter --mdsnode is necessary..."
-		exit 1;
-	fi
+    while :; 
+    do
+        case $1 in
+            --mdsnode=?*)
+                mdsnode=${1#*=}
+                shift
+                ;;
+            --lmt_mgnode=?*)
+                lmt_mgnode=${1#*=}
+                shift
+                ;;
+            -?*)
+                printf 'MULTEXU WARN: Unknown option (ignored): %s\n' "$1" >&2
+                shift
+                ;;
+            *)    # Default case: If no more options then break out of the loop.
+                shift
+                break
+        esac
+    done
+    #处理参数缺省情况,mdsnode是不可缺省的，只有给出方能正确运行，否则非正常终止程序    
+    if [ ! -n "${mdsnode}" ]; then
+        print_message "MULTEXU_ERROR" "the parameter --mdsnode is necessary..."
+        exit 1;
+    fi
 }
 
 main $@
@@ -101,48 +101,48 @@ print_message "MULTEXU_INFO" "the nodes which its ip in nodes_all.out finished t
 
 #没有显式给出Lustre Monitoring Tool management node就默认当前节点为Lustre Monitoring Tool management node
 if [ ! -n "${lmt_mgnode}" ]; then
-	print_message "MULTEXU_INFO" "the Lustre Monitoring Tool management node is default..."
+    print_message "MULTEXU_INFO" "the Lustre Monitoring Tool management node is default..."
     
-	print_message "MULTEXU_INFO" "the current node is going to install mysql..."
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
-	sh ${MULTEXU_BATCH_LMT_DIR}/_mysql_install.sh
-	local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
+    print_message "MULTEXU_INFO" "the current node is going to install mysql..."
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
+    sh ${MULTEXU_BATCH_LMT_DIR}/_mysql_install.sh
+    local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
     
-	print_message "MULTEXU_INFO" "the current node is going to install cerebro..."
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
-	sh ${MULTEXU_BATCH_LMT_DIR}/_cerebro_install.sh
-	local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
+    print_message "MULTEXU_INFO" "the current node is going to install cerebro..."
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
+    sh ${MULTEXU_BATCH_LMT_DIR}/_cerebro_install.sh
+    local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
 
-	print_message "MULTEXU_INFO" "the current node is going to install lmt-server..."
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
-	sh ${MULTEXU_BATCH_LMT_DIR}/_lmt_install.sh --server
-	local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
-	
-	sh ${MULTEXU_BATCH_LMT_DIR}/_configure_cerebro_conf.sh -s ${mdsnode}
+    print_message "MULTEXU_INFO" "the current node is going to install lmt-server..."
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal
+    sh ${MULTEXU_BATCH_LMT_DIR}/_lmt_install.sh --server
+    local_check_status "${MULTEXU_STATUS_EXECUTE}"  "${sleeptime}" "${limit}"
+    
+    sh ${MULTEXU_BATCH_LMT_DIR}/_configure_cerebro_conf.sh -s ${mdsnode}
     
 else
     #清除信号量  避免干扰
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
-	print_message "MULTEXU_INFO" "the node ${lmt_mgnode} is going to install mysql..."
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_LMT_DIR}/_mysql_install.sh"
-	ssh_check_singlenode_status ${lmt_mgnode} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
-	print_message "MULTEXU_INFO" "the node ${lmt_mgnode} finished to install mysql..."
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+    print_message "MULTEXU_INFO" "the node ${lmt_mgnode} is going to install mysql..."
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_LMT_DIR}/_mysql_install.sh"
+    ssh_check_singlenode_status ${lmt_mgnode} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+    print_message "MULTEXU_INFO" "the node ${lmt_mgnode} finished to install mysql..."
 
-	#清除信号量  避免干扰
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
-	print_message "MULTEXU_INFO" "the node ${lmt_mgnode} is going to install cerebro..."
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_LMT_DIR}/_cerebro_install.sh"
-	ssh_check_singlenode_status ${lmt_mgnode} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
-	print_message "MULTEXU_INFO" "the node ${lmt_mgnode} finished to install cerebro..."
+    #清除信号量  避免干扰
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+    print_message "MULTEXU_INFO" "the node ${lmt_mgnode} is going to install cerebro..."
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_LMT_DIR}/_cerebro_install.sh"
+    ssh_check_singlenode_status ${lmt_mgnode} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+    print_message "MULTEXU_INFO" "the node ${lmt_mgnode} finished to install cerebro..."
 
-	#清除信号量  避免干扰
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
-	print_message "MULTEXU_INFO" "the node ${lmt_mgnode} is going to install lmt-server..."
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_LMT_DIR}/_lmt_install.sh --server"
-	ssh_check_singlenode_status ${lmt_mgnode} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
-	print_message "MULTEXU_INFO" "the node ${lmt_mgnode} finished to install lmt-server..."
-	
-	sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_LMT_DIR}/_configure_cerebro_conf.sh -s ${mdsnode}"
+    #清除信号量  避免干扰
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_CRTL_DIR}/multexu_ssh.sh  --clear_execute_statu_signal"
+    print_message "MULTEXU_INFO" "the node ${lmt_mgnode} is going to install lmt-server..."
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_LMT_DIR}/_lmt_install.sh --server"
+    ssh_check_singlenode_status ${lmt_mgnode} "${MULTEXU_STATUS_EXECUTE}" ${sleeptime} ${limit}
+    print_message "MULTEXU_INFO" "the node ${lmt_mgnode} finished to install lmt-server..."
+    
+    sh ${MULTEXU_BATCH_CRTL_DIR}/multexu.sh --iptable=${lmt_mgnode} --cmd="sh ${MULTEXU_BATCH_LMT_DIR}/_configure_cerebro_conf.sh -s ${mdsnode}"
 fi
 
  #重启cerebrod
